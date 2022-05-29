@@ -139,7 +139,7 @@ public final class ChrSelScene extends BaseScene {
 		stage.addActor(btnReback = new ImageButton(new ImageButtonStyle()));
 		stage.addActor(btnRemove = new ImageButton(new ImageButtonStyle()));
 		stage.addActor(btnExit = new ImageButton(new ImageButtonStyle()));
-		stage.addActor(lblTitle = new Label("将唐传奇", new LabelStyle(FontUtil.Song_12_all_outline, Color.WHITE)));
+		stage.addActor(lblTitle = new Label("将唐传奇", new LabelStyle(FontUtil.Song_12_all, Color.WHITE)));
 		stage.addActor(imgChr1 = new Image());
 		stage.addActor(imgChr1Effect = new Image());
 		stage.addActor(imgChr2 = new Image());
@@ -326,16 +326,16 @@ public final class ChrSelScene extends BaseScene {
 			if (lblName1 != null)
 				stage.getActors().removeValue(lblName1, true);
 			stage.addActor(
-					lblName1 = new Label(App.Roles[0].name, new LabelStyle(FontUtil.Song_12_all_outline, Color.WHITE)));
+					lblName1 = new Label(App.Roles[0].name, new LabelStyle(FontUtil.Song_12_all, Color.WHITE)));
 			if (lblLevel1 != null)
 				stage.getActors().removeValue(lblLevel1, true);
 			stage.addActor(lblLevel1 = new Label(String.valueOf(App.Roles[0].level),
-					new LabelStyle(FontUtil.Song_12_all_outline, Color.WHITE)));
+					new LabelStyle(FontUtil.Song_12_all, Color.WHITE)));
 			String occuString = App.Roles[0].type == 0 ? "战士"
 					: App.Roles[0].type == 1 ? "法师" : App.Roles[0].type == 2 ? "道士" : "刺客";
 			if (lblOccu1 != null)
 				stage.getActors().removeValue(lblOccu1, true);
-			stage.addActor(lblOccu1 = new Label(occuString, new LabelStyle(FontUtil.Song_12_all_outline, Color.WHITE)));
+			stage.addActor(lblOccu1 = new Label(occuString, new LabelStyle(FontUtil.Song_12_all, Color.WHITE)));
 			if (App.LastName == null) {
 				App.LastName = App.Roles[0].name;
 			}
@@ -344,16 +344,16 @@ public final class ChrSelScene extends BaseScene {
 			if (lblName2 != null)
 				stage.getActors().removeValue(lblName2, true);
 			stage.addActor(
-					lblName2 = new Label(App.Roles[1].name, new LabelStyle(FontUtil.Song_12_all_outline, Color.WHITE)));
+					lblName2 = new Label(App.Roles[1].name, new LabelStyle(FontUtil.Song_12_all, Color.WHITE)));
 			if (lblLevel2 != null)
 				stage.getActors().removeValue(lblLevel2, true);
 			stage.addActor(lblLevel2 = new Label(String.valueOf(App.Roles[1].level),
-					new LabelStyle(FontUtil.Song_12_all_outline, Color.WHITE)));
+					new LabelStyle(FontUtil.Song_12_all, Color.WHITE)));
 			String occuString = App.Roles[1].type == 0 ? "战士"
 					: App.Roles[1].type == 1 ? "法师" : App.Roles[1].type == 2 ? "道士" : "刺客";
 			if (lblOccu2 != null)
 				stage.getActors().removeValue(lblOccu2, true);
-			stage.addActor(lblOccu2 = new Label(occuString, new LabelStyle(FontUtil.Song_12_all_outline, Color.WHITE)));
+			stage.addActor(lblOccu2 = new Label(occuString, new LabelStyle(FontUtil.Song_12_all, Color.WHITE)));
 		}
 		if (App.LastName != null) {
 			if (App.Roles != null && App.Roles.length > 1 && App.Roles[1].name.equals(App.LastName)) {

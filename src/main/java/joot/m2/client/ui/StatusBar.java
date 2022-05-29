@@ -233,11 +233,11 @@ public final class StatusBar extends WidgetGroup {
 		btnShop.getStyle().over = new TextureRegionDrawable(texs[texIdx++]);
 		btnShop.getStyle().down = new TextureRegionDrawable(texs[texIdx++]);
 		addActor(lblHp = new Label(App.ChrBasic.hp + "/" + App.ChrBasic.maxHp,
-				new LabelStyle(FontUtil.Song_12_all_outline, Color.WHITE)));
+				new LabelStyle(FontUtil.Song_12_all, Color.WHITE)));
 		addActor(lblMp = new Label(App.ChrBasic.mp + "/" + App.ChrBasic.maxMp,
-				new LabelStyle(FontUtil.Song_12_all_outline, Color.WHITE)));
+				new LabelStyle(FontUtil.Song_12_all, Color.WHITE)));
 		addActor(lblMapInfo = new Label(App.MapNames.get(App.MapNo) + " " + App.ChrBasic.x + "," + App.ChrBasic.y,
-				new LabelStyle(FontUtil.Song_12_all_outline, Color.WHITE)));
+				new LabelStyle(FontUtil.Song_12_all, Color.WHITE)));
 		App.ChrBasic.addPropertyChangeListener(e -> {
 			if (e.getPropertyName().equals("x")) {
 				lblMapInfo.setText(App.MapNames.get(App.MapNo) + " " + e.getNewValue() + "," + App.ChrBasic.y);
@@ -247,7 +247,7 @@ public final class StatusBar extends WidgetGroup {
 			}
 			// TODO 血量等改变
 		});
-		addActor(lblAttackMode = new Label("", new LabelStyle(FontUtil.Song_12_all_outline, Color.WHITE)));
+		addActor(lblAttackMode = new Label("", new LabelStyle(FontUtil.Song_12_all, Color.WHITE)));
 		switch (App.ChrPrivate.attackMode) {
 		case All: {
 			lblAttackMode.setText("[全体攻击模式]");
@@ -273,8 +273,8 @@ public final class StatusBar extends WidgetGroup {
 			break;
 		}
 		addActor(lblLevel = new Label(String.valueOf(App.ChrBasic.level),
-				new LabelStyle(FontUtil.Song_12_all_outline, Color.WHITE)));
-		addActor(lblTime = new Label("", new LabelStyle(FontUtil.Song_12_all_outline, Color.WHITE)));
+				new LabelStyle(FontUtil.Song_12_all, Color.WHITE)));
+		addActor(lblTime = new Label("", new LabelStyle(FontUtil.Song_12_all, Color.WHITE)));
 		addActor(imgProgressExp = new Image());
 		addActor(imgProgressBagWeight = new Image());
 		addActor(imgEmptyHp = new Image());

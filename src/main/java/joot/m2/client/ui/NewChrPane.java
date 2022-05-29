@@ -196,7 +196,7 @@ public class NewChrPane extends WidgetGroup {
 		addActor(btnClose = new ImageButton(
 				new ImageButtonStyle(null, new TextureRegionDrawable(texs[texIdx++]), null, null, null, null)));
 
-		addActor(txtName = new TextField("", new TextFieldStyle(FontUtil.Song_12_all_outline, Color.WHITE,
+		addActor(txtName = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
 				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
 		txtName.setWidth(133);
 		txtName.setMaxLength(10);

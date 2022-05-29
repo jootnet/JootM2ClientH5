@@ -130,7 +130,7 @@ public class NewUserPane extends WidgetGroup {
 		addActor(btnClose = new ImageButton(
 				new ImageButtonStyle(null, new TextureRegionDrawable(texs[3]), null, null, null, null)));
 
-		addActor(txtUna = new TextField("", new TextFieldStyle(FontUtil.Song_12_all_outline, Color.WHITE,
+		addActor(txtUna = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
 				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
 		txtUna.setWidth(112);
 		txtUna.setMaxLength(18);
@@ -147,7 +147,7 @@ public class NewUserPane extends WidgetGroup {
 			}
 
 		});
-		addActor(txtPsw = new TextField("", new TextFieldStyle(FontUtil.Song_12_all_outline, Color.WHITE,
+		addActor(txtPsw = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
 				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
 		txtPsw.setWidth(112);
 		txtPsw.setMaxLength(20);
@@ -166,7 +166,7 @@ public class NewUserPane extends WidgetGroup {
 			}
 
 		});
-		addActor(txtPsw1 = new TextField("", new TextFieldStyle(FontUtil.Song_12_all_outline, Color.WHITE,
+		addActor(txtPsw1 = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
 				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
 		txtPsw1.setWidth(112);
 		txtPsw1.setMaxLength(20);
@@ -185,7 +185,7 @@ public class NewUserPane extends WidgetGroup {
 			}
 
 		});
-		addActor(txtName = new TextField("", new TextFieldStyle(FontUtil.Song_12_all_outline, Color.WHITE,
+		addActor(txtName = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
 				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
 		txtName.setWidth(112);
 		txtName.setMaxLength(10);
@@ -202,7 +202,7 @@ public class NewUserPane extends WidgetGroup {
 			}
 
 		});
-		addActor(txtQ1 = new TextField("", new TextFieldStyle(FontUtil.Song_12_all_outline, Color.WHITE,
+		addActor(txtQ1 = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
 				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
 		txtQ1.setWidth(160);
 		txtQ1.setMaxLength(20);
@@ -218,7 +218,7 @@ public class NewUserPane extends WidgetGroup {
 			}
 
 		});
-		addActor(txtA1 = new TextField("", new TextFieldStyle(FontUtil.Song_12_all_outline, Color.WHITE,
+		addActor(txtA1 = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
 				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
 		txtA1.setWidth(160);
 		txtA1.setMaxLength(20);
@@ -234,7 +234,7 @@ public class NewUserPane extends WidgetGroup {
 			}
 
 		});
-		addActor(txtQ2 = new TextField("", new TextFieldStyle(FontUtil.Song_12_all_outline, Color.WHITE,
+		addActor(txtQ2 = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
 				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
 		txtQ2.setWidth(160);
 		txtQ2.setMaxLength(20);
@@ -250,7 +250,7 @@ public class NewUserPane extends WidgetGroup {
 			}
 
 		});
-		addActor(txtA2 = new TextField("", new TextFieldStyle(FontUtil.Song_12_all_outline, Color.WHITE,
+		addActor(txtA2 = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
 				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
 		txtA2.setWidth(160);
 		txtA2.setMaxLength(20);
@@ -266,7 +266,7 @@ public class NewUserPane extends WidgetGroup {
 			}
 
 		});
-		addActor(txtTelPhone = new TextField("", new TextFieldStyle(FontUtil.Song_12_all_outline, Color.WHITE,
+		addActor(txtTelPhone = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
 				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
 		txtTelPhone.setWidth(112);
 		txtTelPhone.setMaxLength(18);
@@ -283,7 +283,7 @@ public class NewUserPane extends WidgetGroup {
 			}
 
 		});
-		addActor(txtiPhone = new TextField("", new TextFieldStyle(FontUtil.Song_12_all_outline, Color.WHITE,
+		addActor(txtiPhone = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
 				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
 		txtiPhone.setWidth(112);
 		txtiPhone.setMaxLength(18);
@@ -300,7 +300,7 @@ public class NewUserPane extends WidgetGroup {
 			}
 
 		});
-		addActor(txtMail = new TextField("", new TextFieldStyle(FontUtil.Song_12_all_outline, Color.WHITE,
+		addActor(txtMail = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
 				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
 		txtMail.setWidth(160);
 		txtMail.setMaxLength(20);
@@ -317,7 +317,7 @@ public class NewUserPane extends WidgetGroup {
 			}
 
 		});
-		addActor(lblTips = new Label("", new LabelStyle(FontUtil.Song_12_all_outline, Color.WHITE)));
+		addActor(lblTips = new Label("", new LabelStyle(FontUtil.Song_12_all, Color.WHITE)));
 		lblTips.setAlignment(Align.top | Align.left, Align.left);
 		lblTips.setSize(200, 280);
 

@@ -161,11 +161,11 @@ public final class LoginPane extends WidgetGroup {
 
 		});
 
-		addActor(txtUna = new TextField("", new TextFieldStyle(FontUtil.Song_12_all_outline, Color.WHITE,
+		addActor(txtUna = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
 					DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
 		txtUna.setWidth(130);
 		txtUna.setMaxLength(20);
-		addActor(txtPsw = new TextField("", new TextFieldStyle(FontUtil.Song_12_all_outline, Color.WHITE,
+		addActor(txtPsw = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
 				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
 		txtPsw.setWidth(130);
 		txtPsw.setMaxLength(20);

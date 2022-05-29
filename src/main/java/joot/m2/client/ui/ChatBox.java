@@ -88,7 +88,7 @@ public final class ChatBox extends WidgetGroup {
 		for (int i = 0, j = readIdxMsg; i < linesMsg.length; ++i, ++j) {
 			if (j >= strsMsg.length) j = 0;
 			if (strsMsg[j] == null) break;
-			Label lblMsg = new Label(strsMsg[j], new LabelStyle(FontUtil.Song_12_all_outline, colorsMsg[j]));
+			Label lblMsg = new Label(strsMsg[j], new LabelStyle(FontUtil.Song_12_all, colorsMsg[j]));
 			linesMsg[i].background(bgsMsg[j])
 				.add(lblMsg)
 				.left()
@@ -115,7 +115,7 @@ public final class ChatBox extends WidgetGroup {
 		if (inited) return true;
 		M2Texture[] texs = Images.get(IntStream.range(500, 510).mapToObj(i -> "ui3/" + i).collect(Collectors.toList()).toArray(new String[0]));
 		if (texs == null) return false;
-		addActor(txtChat = new TextField("", new TextField.TextFieldStyle(FontUtil.Song_12_all_outline,
+		addActor(txtChat = new TextField("", new TextField.TextFieldStyle(FontUtil.Song_12_all,
 				Color.BLACK,
 				DrawableUtil.Cursor_DarkGray,
 				DrawableUtil.Bg_LightGray,

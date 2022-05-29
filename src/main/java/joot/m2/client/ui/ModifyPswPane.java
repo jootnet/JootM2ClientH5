@@ -107,12 +107,12 @@ public class ModifyPswPane extends WidgetGroup {
 		addActor(btnCommit = new ImageButton(
 				new ImageButtonStyle(null, new TextureRegionDrawable(texs[2]), null, null, null, null)));
 
-		addActor(txtUna = new TextField("", new TextFieldStyle(FontUtil.Song_12_all_outline, Color.WHITE,
+		addActor(txtUna = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
 				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
 		txtUna.setWidth(130);
 		txtUna.setMaxLength(18);
 		txtUna.setTextFieldFilter((t, c) -> Character.isLetterOrDigit(c));
-		addActor(txtPswO = new TextField("", new TextFieldStyle(FontUtil.Song_12_all_outline, Color.WHITE,
+		addActor(txtPswO = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
 				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
 		txtPswO.setWidth(130);
 		txtPswO.setMaxLength(20);
@@ -121,14 +121,14 @@ public class ModifyPswPane extends WidgetGroup {
 		txtPswO.setTextFieldFilter((t, c) -> Character.isLetterOrDigit(c) || c == '@' || c == '$' || c == '.'
 				|| c == '_' || c == '-' || c == '*' || c == '^' || c == '%' || c == '&' || c == '#' || c == '!'
 				|| c == '~' || c == '`');
-		addActor(txtPsw = new TextField("", new TextFieldStyle(FontUtil.Song_12_all_outline, Color.WHITE,
+		addActor(txtPsw = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
 				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
 		txtPsw.setWidth(130);
 		txtPsw.setMaxLength(20);
 		txtPsw.setTextFieldFilter((t, c) -> Character.isLetterOrDigit(c) || c == '@' || c == '$' || c == '.' || c == '_'
 				|| c == '-' || c == '*' || c == '^' || c == '%' || c == '&' || c == '#' || c == '!' || c == '~'
 				|| c == '`');
-		addActor(txtPsw1 = new TextField("", new TextFieldStyle(FontUtil.Song_12_all_outline, Color.WHITE,
+		addActor(txtPsw1 = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
 				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
 		txtPsw1.setWidth(130);
 		txtPsw1.setMaxLength(20);
