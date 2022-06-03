@@ -1,8 +1,6 @@
 package com.github.jootnet.m2.core.image;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.ArrayDeque;
 import java.util.Map;
 import java.util.Queue;
@@ -11,7 +9,13 @@ import com.github.jootnet.m2.core.NetworkUtil;
 import com.github.jootnet.m2.core.NetworkUtil.HttpRequest;
 import com.github.jootnet.m2.core.NetworkUtil.HttpResponseListener;
 import com.github.jootnet.m2.core.SDK;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptException;
+import com.google.gwt.typedarrays.client.ArrayBufferNative;
+import com.google.gwt.typedarrays.client.DataViewNative;
+import com.google.gwt.typedarrays.shared.ArrayBuffer;
+import com.google.gwt.typedarrays.shared.DataView;
+import com.google.gwt.typedarrays.shared.Uint8Array;
 
 /**
  * WZL文件解析类
@@ -81,13 +85,9 @@ public final class WZL implements HttpResponseListener {
 
 	/**
 	 * 加载特定编号纹理 <br>
-	 * 当这些编号纹理加载完毕之后，仍会在后台继续加载库内其他纹理，并通过{@link TextureConsumer#recv(Texture)}向外告知
-	 * <br>
-	 * 此函数可多次调用，以打断后台顺序加载其他纹理 <br>
-	 * 库内所有纹理加载完毕后会触发{@link LoadCompleted#op()}向外告知 <br>
-	 * 如果wzl文件来自微端，则会复制到wzx同级目录
-	 * 
-	 * @param seizes 需要优先加载的纹理编号
+	 * 当这些编号纹理加载完毕之后，仍会在后台继续加载库内其他纹理，并通过{@link TextureConsumer#recv(String, int, Texture)}向外告知
+	 *
+	 * @param seizes 需要加载的纹理编号
 	 * @return 当前对象
 	 */
 	public WZL load(int... seizes) {
@@ -142,9 +142,10 @@ public final class WZL implements HttpResponseListener {
 		}
 	}
 
-	private void unpackTextures(byte[] data) throws IOException {
+	private void unpackTextures(ArrayBuffer data) throws IOException {
 		if (startNo == -1) return;
-		ByteBuffer byteBuffer = ByteBuffer.wrap(data).order(ByteOrder.LITTLE_ENDIAN);
+		int idx = 0;
+		DataView byteBuffer = DataViewNative.create(data);
 		for (int no = startNo; no < imageCount; ++no) {
 			if (offsetList[no] == 0) {
 				if (!loadedFlag[no]) {
@@ -154,16 +155,23 @@ public final class WZL implements HttpResponseListener {
 				}
 				continue;
 			}
-			if (byteBuffer.remaining() < 16)
+			if ((byteBuffer.byteLength() - idx) < 16)
 				break;
-			byte colorBit = byteBuffer.get();
-			boolean compressFlag = byteBuffer.get() != 0;
-			byteBuffer.position(byteBuffer.position() + 2); // 2字节未知数据
-			short width = byteBuffer.getShort();
-			short height = byteBuffer.getShort();
-			short offsetX = byteBuffer.getShort();
-			short offsetY = byteBuffer.getShort();
-			int dataLen = byteBuffer.getInt();
+			byte colorBit = byteBuffer.getInt8(idx);
+			idx += 1;
+			boolean compressFlag = byteBuffer.getInt8(idx) != 0;
+			idx += 1;
+			idx += 2; // 2字节未知数据
+			short width = byteBuffer.getInt16(idx, true);
+			idx += 2;
+			short height = byteBuffer.getInt16(idx, true);
+			idx += 2;
+			short offsetX = byteBuffer.getInt16(idx, true);
+			idx += 2;
+			short offsetY = byteBuffer.getInt16(idx, true);
+			idx += 2;
+			int dataLen = byteBuffer.getInt32(idx, true);
+			idx += 4;
 			if (dataLen == 0) {
 				// 这里可能是一个bug，或者是其他引擎作者没有说清楚
 				// 本来一直以为是compressFlag作为是否zlib压缩的标志位
@@ -172,22 +180,23 @@ public final class WZL implements HttpResponseListener {
 				if (colorBit == 5) dataLen *= 2;
 				compressFlag = false;
 			}
-			if (byteBuffer.remaining() < dataLen)
+			if ((byteBuffer.byteLength() - idx) < dataLen)
 				break;
 			if (loadedFlag[no]) {
-				byteBuffer.position(byteBuffer.position() + dataLen);
+				idx += dataLen;
 				continue;
 			}
-			byte[] pixels = new byte[dataLen];
-			byteBuffer.get(pixels);
+			DataView pixels = DataViewNative.create(data, idx);
 			if (compressFlag) {
 				try {
-					pixels = SDK.unzip(pixels);
+					Uint8Array tmpArr = SDK.unzip(data, idx);
+					pixels = DataViewNative.create(tmpArr.buffer(), tmpArr.byteOffset(), tmpArr.byteLength());
 				} catch (JavaScriptException e) {
 					e.printStackTrace();
 				}
 			}
-			byte[] sRGBA = new byte[width * height * 4];
+			idx += dataLen;
+			DataView sRGBA = DataViewNative.create(ArrayBufferNative.create(width * height * 4));
 			if (colorBit != 5) { // 8位
 				int p_index = 0;
 				for (int h = height - 1; h >= 0; --h)
@@ -195,33 +204,32 @@ public final class WZL implements HttpResponseListener {
 						// 跳过填充字节
 						if (w == 0)
 							p_index += SDK.skipBytes(8, width);
-						byte[] pallete = SDK.palletes[pixels[p_index++] & 0xff];
+						byte[] pallete = SDK.palletes[pixels.getInt8(p_index++) & 0xff];
 						int _idx = (w + h * width) * 4;
-						sRGBA[_idx] = pallete[1];
-						sRGBA[_idx + 1] = pallete[2];
-						sRGBA[_idx + 2] = pallete[3];
-						sRGBA[_idx + 3] = pallete[0];
+						sRGBA.setInt8(_idx, pallete[1]);
+						sRGBA.setInt8(_idx + 1, pallete[2]);
+						sRGBA.setInt8(_idx + 2, pallete[3]);
+						sRGBA.setInt8(_idx + 3, pallete[0]);
 					}
 			} else { // 16位
-				ByteBuffer bb = ByteBuffer.wrap(pixels).order(ByteOrder.LITTLE_ENDIAN);
 				int p_index = 0;
 				for (int h = height - 1; h >= 0; --h)
 					for (int w = 0; w < width; ++w, p_index += 2) {
 						// 跳过填充字节
 						if (w == 0)
 							p_index += SDK.skipBytes(16, width);
-						short pdata = bb.getShort(p_index);
+						short pdata = pixels.getInt16(p_index, true);
 						byte r = (byte) ((pdata & 0xf800) >> 8);// 由于是与16位做与操作，所以多出了后面8位
 						byte g = (byte) ((pdata & 0x7e0) >> 3);// 多出了3位，在强转时前8位会自动丢失
 						byte b = (byte) ((pdata & 0x1f) << 3);// 少了3位
 						int _idx = (w + h * width) * 4;
-						sRGBA[_idx] = r;
-						sRGBA[_idx + 1] = g;
-						sRGBA[_idx + 2] = b;
+						sRGBA.setInt8(_idx, r);
+						sRGBA.setInt8(_idx + 1, g);
+						sRGBA.setInt8(_idx + 2, b);
 						if (r == 0 && g == 0 && b == 0) {
-							sRGBA[_idx + 3] = 0;
+							sRGBA.setInt8(_idx + 3, 0);
 						} else {
-							sRGBA[_idx + 3] = -1;
+							sRGBA.setInt8(_idx + 3, -1);
 						}
 					}
 			}
@@ -258,26 +266,34 @@ public final class WZL implements HttpResponseListener {
 	private static Texture EMPTY;
 	
 	static {
-		EMPTY = new Texture(true, 1, 1, 0, 0, new byte[] { SDK.palletes[0][1], SDK.palletes[0][2], SDK.palletes[0][3], SDK.palletes[0][0] });
+		DataView dv = DataViewNative.create(ArrayBufferNative.create(4));
+		dv.setInt8(0, SDK.palletes[0][1]);
+		dv.setInt8(1, SDK.palletes[0][2]);
+		dv.setInt8(2, SDK.palletes[0][3]);
+		dv.setInt8(3, SDK.palletes[0][0]);
+		EMPTY = new Texture(true, 1, 1, 0, 0, dv);
 	}
 
 	@Override
-	public void onLoad(byte[] message) {
+	public void onLoad(ArrayBuffer message) {
 		downloading = false;
 		if (offsetList == null) {
-			byte[] dData = message;
+			DataView byteBuffer = DataViewNative.create(message);
 			try {
-				dData = SDK.unzip(dData);
+				Uint8Array tmpArr = SDK.unzip(message);
+				byteBuffer = DataViewNative.create(tmpArr.buffer(), tmpArr.byteOffset(), tmpArr.byteLength());
 			} catch (JavaScriptException ex) {
 				ex.printStackTrace();
 			}
-			ByteBuffer byteBuffer = ByteBuffer.wrap(dData).order(ByteOrder.LITTLE_ENDIAN);
-			byteBuffer.position(44);
-			imageCount = byteBuffer.getInt();
+			int idx = 0;
+			idx += 44;
+			imageCount = byteBuffer.getInt32(idx, true);
+			idx += 4;
 			offsetList = new int[imageCount + 1];
 			loadedFlag = new boolean[imageCount];
 			for (int i = 0; i < imageCount; ++i) {
-				offsetList[i] = byteBuffer.getInt();// UnsignedInt
+				offsetList[i] = byteBuffer.getInt32(idx, true);//Uint32
+				idx += 4;
 				if (offsetList[i] < 64) offsetList[i] = 0;
 			}
 		} else if (fLen != -1) {

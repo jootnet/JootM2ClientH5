@@ -64,7 +64,7 @@ public final class NetworkUtil {
     public static interface HttpResponseListener {
     	void recvHeaders(Map<String, String> headers);
     	
-    	void onLoad(byte[] message);
+    	void onLoad(ArrayBuffer message);
     	void onLoad(String message);
     	
     	void onError();
@@ -97,12 +97,17 @@ public final class NetworkUtil {
 			    								self.xhr.ontimeout = function(event) { self.@com.github.jootnet.m2.core.NetworkUtil.XmlHttpRequest::onTimeout()(); };
 			    								self.xhr.onerror = function(event) { self.@com.github.jootnet.m2.core.NetworkUtil.XmlHttpRequest::onError()(); };
 			    								self.xhr.onload = function(event) {
+                                                    if (self.xhr.status == 404) {
+                                                        console.log("404");
+													}
 			    									self.@com.github.jootnet.m2.core.NetworkUtil.XmlHttpRequest::recvHeaders(Ljava/lang/String;)(self.xhr.getAllResponseHeaders());
 			    									if (self.xhr.responseType == 'arraybuffer') {
 			    										self.@com.github.jootnet.m2.core.NetworkUtil.XmlHttpRequest::onLoad(Lcom/google/gwt/typedarrays/shared/ArrayBuffer;)(self.xhr.response);
+			    									} else if (self.xhr.responseType == 'blob') {
+														console.log("blob");
 			    									} else {
-			    										self.@com.github.jootnet.m2.core.NetworkUtil.XmlHttpRequest::onLoad(Ljava/lang/String;)(self.xhr.response);
-			    									}
+														self.@com.github.jootnet.m2.core.NetworkUtil.XmlHttpRequest::onLoad(Ljava/lang/String;)(self.xhr.response);
+													}
 												};
 												if (binary) {
 													self.xhr.responseType = 'arraybuffer';
@@ -136,7 +141,7 @@ public final class NetworkUtil {
     		xmlHttpRequests.remove(this);
     		if (arrayBuffer != null && arrayBuffer.byteLength() > 0) {
 	    		if (respListener != null)
-	    			respListener.onLoad(toByteArray(arrayBuffer));
+	    			respListener.onLoad(arrayBuffer);
     		}
     	}
     	private void onError() {
@@ -161,15 +166,5 @@ public final class NetworkUtil {
     			}
     		}
     	}
-        
-        private static byte[] toByteArray(final ArrayBuffer arrayBuffer) {
-            final Int8Array array = Int8ArrayNative.create(arrayBuffer);
-            final int length = array.byteLength();
-            final byte[] byteArray = new byte[length];
-            for (int index = 0; index < length; index++) {
-                byteArray[index] = array.get(index);
-            }
-            return byteArray;
-        }
     }
 }

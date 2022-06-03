@@ -104,6 +104,8 @@ public final class NetworkUtil {
 		ws.setListener(new WebSocketListenerImpl());
 		try {
 			ws.connect();
+			lastRecvTime = System.currentTimeMillis();
+			lastSendTime = System.currentTimeMillis();
 		} catch (Exception ex) { }
 	}
 	
@@ -355,7 +357,10 @@ public final class NetworkUtil {
         public WebSocketException(final String message, final Throwable cause) {
             super(message, cause);
         }
-    }
+
+		private WebSocketException() {
+		}
+	}
     
     private static class Websocket {
     	private String url;
@@ -436,8 +441,9 @@ public final class NetworkUtil {
         }
 
         private native void nativeClose(int code, String reason)/*-{
-                                                            if(this.ws){
-                                                            this.ws.close(code,reason);
+															var self = this;
+                                                            if(self.ws){
+                                                            self.ws.close(code,reason);
                                                             }
                                                             }-*/;
 
@@ -453,9 +459,10 @@ public final class NetworkUtil {
         }
 
         private native void sendArrayBuffer(ArrayBuffer message)/*-{
-                                                                  if(this.ws) {
-                                                                  this.ws.send(message);
-                                                                  }
+																  var self = this;
+																  if(self.ws) {
+																	  self.ws.send(message);
+																  }
                                                                   }-*/;
 
         private void sendString(final String message) {
@@ -467,8 +474,9 @@ public final class NetworkUtil {
         }
 
         private native void sendText(String message)/*-{
-                                                      if(this.ws) {
-                                                      this.ws.send(message);
+													  var self = this;
+                                                      if(self.ws) {
+														  self.ws.send(message);
                                                       }
                                                       }-*/;
         

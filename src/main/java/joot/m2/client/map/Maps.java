@@ -11,6 +11,11 @@ import com.github.jootnet.m2.core.NetworkUtil.HttpResponseListener;
 import com.github.jootnet.m2.core.SDK;
 import com.github.jootnet.m2.core.map.MapTileInfo;
 import com.google.gwt.core.client.JavaScriptException;
+import com.google.gwt.core.shared.GWT;
+import com.google.gwt.typedarrays.client.DataViewNative;
+import com.google.gwt.typedarrays.shared.ArrayBuffer;
+import com.google.gwt.typedarrays.shared.DataView;
+import com.google.gwt.typedarrays.shared.Uint8Array;
 
 /** 地图异步加载对象 */
 public final class Maps {
@@ -40,6 +45,7 @@ public final class Maps {
 		if (maps.containsKey(mapNo))
 			return maps.get(mapNo);
 		if (downloadingMaps.contains(mapNo)) return null;
+		downloadingMaps.add(mapNo);
 		NetworkUtil.sendHttpRequest(new HttpRequest(wdBaseUrl + "map/" + mapNo + ".map").setTimeout(5000).setBinary(), new HttpResponseListener() {
 			
 			@Override
@@ -53,14 +59,15 @@ public final class Maps {
 			}
 			
 			@Override
-			public void onLoad(byte[] message) {
-				byte[] dData = message;
+			public void onLoad(ArrayBuffer message) {
+				DataView buffer = DataViewNative.create(message);
 				try {
-					dData = SDK.unzip(dData);
+					Uint8Array tmpArr = SDK.unzip(message);
+					buffer = DataViewNative.create(tmpArr.buffer(), tmpArr.byteOffset(), tmpArr.byteLength());
 				} catch (JavaScriptException ex) {
 					ex.printStackTrace();
 				}
-				com.github.jootnet.m2.core.map.Map m2map = new com.github.jootnet.m2.core.map.Map(dData);
+				com.github.jootnet.m2.core.map.Map m2map = new com.github.jootnet.m2.core.map.Map(buffer);
 				Map map = new Map(m2map.getWidth(), m2map.getHeight());
 				IntStream.range(0, m2map.getWidth()).parallel().forEach(_w -> {
 					IntStream.range(0, m2map.getHeight()).parallel().forEach(_h -> {
@@ -96,6 +103,7 @@ public final class Maps {
 					});
 				});
 				maps.put(mapNo, map);
+				downloadingMaps.remove(mapNo);
 			}
 			
 			@Override

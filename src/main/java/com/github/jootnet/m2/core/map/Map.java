@@ -16,8 +16,10 @@
  */
 package com.github.jootnet.m2.core.map;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import com.google.gwt.core.shared.GWT;
+import com.google.gwt.typedarrays.client.DataViewNative;
+import com.google.gwt.typedarrays.shared.ArrayBuffer;
+import com.google.gwt.typedarrays.shared.DataView;
 
 /**
  * 热血传奇2地图
@@ -43,22 +45,27 @@ public final class Map {
 	
 	public Map() { }
 	
-	public Map(byte[] mapData) {
-		ByteBuffer buffer = ByteBuffer.wrap(mapData).order(ByteOrder.LITTLE_ENDIAN);
-		this.setWidth(buffer.getShort());
-		this.setHeight(buffer.getShort());
-		buffer.position(buffer.position() + 48);
-		int tileByteSize = buffer.remaining() / this.getWidth() / this.getHeight();
+	public Map(DataView buffer) {
+		int idx = 0;
+		this.setWidth(buffer.getInt16(idx, true));
+		idx += 2;
+		this.setHeight(buffer.getInt16(idx, true));
+		idx += 2;
+		idx += 48;
+		int tileByteSize = (buffer.byteLength() - idx) / this.getWidth() / this.getHeight();
 		MapTileInfo[][] mapTileInfos = new MapTileInfo[this.getWidth()][this.getHeight()];
 		for (int width = 0; width < this.getWidth(); ++width)
 			for (int height = 0; height < this.getHeight(); ++height) {
 				MapTileInfo mi = new MapTileInfo();
 				// 读取背景
-				short bng = buffer.getShort();
+				short bng = buffer.getInt16(idx, true);
+				idx += 2;
 				// 读取中间层
-				short mid = buffer.getShort();
+				short mid = buffer.getInt16(idx, true);
+				idx += 2;
 				// 读取对象层
-				short obj = buffer.getShort();
+				short obj = buffer.getInt16(idx, true);
+				idx += 2;
 				// 设置背景
 				if ((bng & 0x7fff) > 0) {
 					mi.setBngImgIdx((short) ((bng & 0x7fff) - 1));
@@ -80,19 +87,22 @@ public final class Map {
 				mi.setCanFly((obj & 0x8000) != 0x8000);
 
 				// 读取门索引(第7个byte)
-				byte btTmp = buffer.get();
+				byte btTmp = buffer.getInt8(idx);
+				idx += 1;
 				if ((btTmp & 0x80) == 0x80) {
 					mi.setDoorCanOpen(true);
 				}
 				mi.setDoorIdx((byte) (btTmp & 0x7F));
 				// 读取门偏移(第8个byte)
-				btTmp = buffer.get();
+				btTmp = buffer.getInt8(idx);
+				idx += 1;
 				if (btTmp != 0) {
 					mi.setHasDoor(true);
 				}
 				mi.setDoorOffset((short) (btTmp & 0xFF));
 				// 读取动画帧数(第9个byte)
-				btTmp = buffer.get();
+				btTmp = buffer.getInt8(idx);
+				idx += 1;
 				if ((btTmp & 0x7F) > 0) {
 					mi.setAniFrame((byte) (btTmp & 0x7F));
 					mi.setHasAni(true);
@@ -100,22 +110,27 @@ public final class Map {
 					mi.setAniBlendMode((btTmp & 0x80) == 0x80);
 				}
 				// 读取并设置动画跳帧数(第10个byte)
-				mi.setAniTick(buffer.get());
+				mi.setAniTick(buffer.getInt8(idx));
+				idx += 1;
 				// 读取资源文件索引(第11个byte)
-				mi.setObjFileIdx(buffer.get());
+				mi.setObjFileIdx(buffer.getInt8(idx));
+				idx += 1;
 				if (mi.getObjFileIdx() != 0)
 					mi.setObjFileIdx((byte) (mi.getObjFileIdx() + 1));
 				// 读取光照(第12个byte)
-				mi.setLight(buffer.get());
+				mi.setLight(buffer.getInt8(idx));
+				idx += 1;
 				if (tileByteSize == 14) {
-					mi.setBngFileIdx(buffer.get());
+					mi.setBngFileIdx(buffer.getInt8(idx));
+					idx += 1;
 					if (mi.getBngFileIdx() != 0)
 						mi.setBngFileIdx((byte) (mi.getBngFileIdx() + 1));
-					mi.setMidFileIdx(buffer.get());
+					mi.setMidFileIdx(buffer.getInt8(idx));
+					idx += 1;
 					if (mi.getMidFileIdx() != 0)
 						mi.setMidFileIdx((byte) (mi.getMidFileIdx() + 1));
 				} else if (tileByteSize > 14) {
-					buffer.position(buffer.position() + tileByteSize - 14);
+					idx += tileByteSize - 14;
 					System.err.println("unkwon tileByteSize " + tileByteSize);
 				}
 				if (width % 2 != 0 || height % 2 != 0)

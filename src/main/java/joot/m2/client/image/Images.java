@@ -1,6 +1,6 @@
 package joot.m2.client.image;
 
-import java.nio.ByteBuffer;
+import java.nio.ByteBufferUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -134,7 +134,7 @@ public final class Images {
 			return tex;
 		}
 	}
-	
+
 	private static void load(String fileName) {
 		String[] lib_idx = fileName.split("/");
 		if (WZLs.containsKey(lib_idx[0])) {
@@ -142,24 +142,17 @@ public final class Images {
 		} else {
 			WZL wzl = new WZL(lib_idx[0], wdBaseUrl);
 			wzl.onTextureLoaded((fno, no, tex) -> {
-				//com.google.gwt.user.client.Window.alert(fileName + " 1");
 				if (tex.isEmpty) {
 					if (EMPTY == null) {
 						Pixmap pm = new Pixmap(tex.width, tex.height, Pixmap.Format.RGBA8888);
-						ByteBuffer buffer = ByteBuffer.allocateDirect(tex.pixels.length);
-						buffer.put(tex.pixels);
-						pm.setPixels(buffer);
+						pm.setPixels(ByteBufferUtil.of(tex.pixels.buffer()));
 						EMPTY = new M2Texture(pm, (short) tex.offsetX, (short) tex.offsetY);
 					}
 					textures.put(fno + "/" + no, EMPTY);
-					//com.google.gwt.user.client.Window.alert(fileName + " 2");
 				} else {
 					Pixmap pm = new Pixmap(tex.width, tex.height, Pixmap.Format.RGBA8888);
-					ByteBuffer buffer = ByteBuffer.allocateDirect(tex.pixels.length);
-					buffer.put(tex.pixels);
-					pm.setPixels(buffer);
+					pm.setPixels(ByteBufferUtil.of(tex.pixels.buffer()));
 					textures.put(fno + "/" + no, new M2Texture(pm, (short) tex.offsetX, (short) tex.offsetY));
-					//com.google.gwt.user.client.Window.alert(fileName + " 3");
 				}
 			});
 			wzl.load(Integer.parseInt(lib_idx[1]));

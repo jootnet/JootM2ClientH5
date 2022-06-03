@@ -7,11 +7,12 @@
 	<inherits name="de.tomgrill.gdxdialogs.html.gdx_dialogs_html" />
 	
 	<inherits name="com.github.jootnet.m2.core.JootM2Core" />
+	<inherits name="java.nio.java_nio" />
 
 	<entry-point class='joot.m2.client.HtmlLauncher' />
 	<set-configuration-property name='xsiframe.failIfScriptTag' value='FALSE'/>
-	<set-configuration-property name="gdx.assetpath" value="assets,../../assets" />
-	<set-configuration-property name="gdx.assetoutputpath" value="src/main/webapp" />
+	<set-configuration-property name="gdx.assetpath" value="/Users/linxing/git/JootM2ClientH5/assets" />
+	<set-configuration-property name="gdx.assetoutputpath" value="/Users/linxing/git/JootM2ClientH5/src/main/webapp" />
 	<set-property name="user.agent" value="gecko1_8, safari"/>
 	<collapse-property name="user.agent" values="*" />
 </module>
