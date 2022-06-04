@@ -1,6 +1,5 @@
 package com.github.jootnet.m2.core.image;
 
-import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Map;
 import java.util.Queue;
@@ -9,7 +8,6 @@ import com.github.jootnet.m2.core.NetworkUtil;
 import com.github.jootnet.m2.core.NetworkUtil.HttpRequest;
 import com.github.jootnet.m2.core.NetworkUtil.HttpResponseListener;
 import com.github.jootnet.m2.core.SDK;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptException;
 import com.google.gwt.typedarrays.client.ArrayBufferNative;
 import com.google.gwt.typedarrays.client.DataViewNative;
@@ -43,15 +41,13 @@ public final class WZL implements HttpResponseListener {
 	/** 纹理消费者 */
 	private TextureConsumer textureConsumer;
 	/** wzx网络路径 */
-	private String wzxUrl;
+	private final String wzxUrl;
 	/** wzl网络路径 */
-	private String wzlUrl;
+	private final String wzlUrl;
 	/** 待加载的纹理编号 */
-	private Queue<Integer> seizes;
+	private final Queue<Integer> seizes;
 	/** 文件名 */
-	private String fno;
-	/** 单次加载最大数据量（从磁盘或网络下载） */
-	private int maxLoadSizePer = 256 * 1024; // 默认256K
+	private final String fno;
 	/** 是否处于下载过程中 */
 	private boolean downloading;
 	/** 当前加载纹理编号 */
@@ -76,11 +72,9 @@ public final class WZL implements HttpResponseListener {
 	 * 设置纹理加载完成回调
 	 * 
 	 * @param consumer 事件处理函数
-	 * @return 当前对象
 	 */
-	public WZL onTextureLoaded(TextureConsumer consumer) {
+	public void onTextureLoaded(TextureConsumer consumer) {
 		textureConsumer = consumer;
-		return this;
 	}
 
 	/**
@@ -88,14 +82,12 @@ public final class WZL implements HttpResponseListener {
 	 * 当这些编号纹理加载完毕之后，仍会在后台继续加载库内其他纹理，并通过{@link TextureConsumer#recv(String, int, Texture)}向外告知
 	 *
 	 * @param seizes 需要加载的纹理编号
-	 * @return 当前对象
 	 */
-	public WZL load(int... seizes) {
+	public void load(int... seizes) {
 		for (int i : seizes) {
 			this.seizes.offer(i);
 		}
 		doDownload();
-		return this;
 	}
 	
 	private void doDownload() {
@@ -136,13 +128,16 @@ public final class WZL implements HttpResponseListener {
 					break;
 				}
 			}
+			// 单次加载最大数据量（从磁盘或网络下载）
+			// 默认256K
+			int maxLoadSizePer = 256 * 1024;
 			long rangeEnd = Math.min(startOffset + Math.max(maxLoadSizePer, texDataLen), fLen - 1);
 			downloading = true;
-			NetworkUtil.sendHttpRequest(new HttpRequest(wzlUrl).setBinary().addHeader("Range", "bytes=" + startOffset + "-" + rangeEnd), this);
+			NetworkUtil.sendHttpRequest(new HttpRequest(wzlUrl).setBinary().setRange(startOffset, (int) rangeEnd), this);
 		}
 	}
 
-	private void unpackTextures(ArrayBuffer data) throws IOException {
+	private void unpackTextures(ArrayBuffer data) {
 		if (startNo == -1) return;
 		int idx = 0;
 		DataView byteBuffer = DataViewNative.create(data);
@@ -197,8 +192,8 @@ public final class WZL implements HttpResponseListener {
 			}
 			idx += dataLen;
 			DataView sRGBA = DataViewNative.create(ArrayBufferNative.create(width * height * 4));
+			int p_index = 0;
 			if (colorBit != 5) { // 8位
-				int p_index = 0;
 				for (int h = height - 1; h >= 0; --h)
 					for (int w = 0; w < width; ++w) {
 						// 跳过填充字节
@@ -212,7 +207,6 @@ public final class WZL implements HttpResponseListener {
 						sRGBA.setInt8(_idx + 3, pallete[0]);
 					}
 			} else { // 16位
-				int p_index = 0;
 				for (int h = height - 1; h >= 0; --h)
 					for (int w = 0; w < width; ++w, p_index += 2) {
 						// 跳过填充字节
@@ -252,18 +246,8 @@ public final class WZL implements HttpResponseListener {
 		void recv(String fno, int no, Texture tex);
 	}
 
-	@FunctionalInterface
-	public interface LoadCompletedEventHandler {
-		/**
-		 * 所有纹理加载完毕后触发
-		 * 
-		 * @param fno 文件编号
-		 */
-		void loadCompleted(String fno);
-	}
-
 	/** 空图片 */
-	private static Texture EMPTY;
+	private final static Texture EMPTY;
 	
 	static {
 		DataView dv = DataViewNative.create(ArrayBufferNative.create(4));
@@ -297,11 +281,7 @@ public final class WZL implements HttpResponseListener {
 				if (offsetList[i] < 64) offsetList[i] = 0;
 			}
 		} else if (fLen != -1) {
-			try {
-				unpackTextures(message);
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
+			unpackTextures(message);
 		}
 		doDownload();
 	}

@@ -5,13 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.typedarrays.client.Int8ArrayNative;
 import com.google.gwt.typedarrays.shared.ArrayBuffer;
-import com.google.gwt.typedarrays.shared.Int8Array;
 
 public final class NetworkUtil {
 	/** 正在执行的http请求集合 */
-	private static List<XmlHttpRequest> xmlHttpRequests = new ArrayList<>();
+	private static final List<XmlHttpRequest> xmlHttpRequests = new ArrayList<>();
 
 	
 	/**
@@ -22,8 +20,8 @@ public final class NetworkUtil {
 	}
     
     public static class HttpRequest {
-    	private Map<String, String> headers = new HashMap<>();
-    	private String url;
+    	private final Map<String, String> headers = new HashMap<>();
+    	private final String url;
     	private String method = "GET";
     	private Integer rangeStart;
     	private Integer rangeEnd;
@@ -61,7 +59,7 @@ public final class NetworkUtil {
     	}
     }
     
-    public static interface HttpResponseListener {
+    public interface HttpResponseListener {
     	void recvHeaders(Map<String, String> headers);
     	
     	void onLoad(ArrayBuffer message);
@@ -97,14 +95,9 @@ public final class NetworkUtil {
 			    								self.xhr.ontimeout = function(event) { self.@com.github.jootnet.m2.core.NetworkUtil.XmlHttpRequest::onTimeout()(); };
 			    								self.xhr.onerror = function(event) { self.@com.github.jootnet.m2.core.NetworkUtil.XmlHttpRequest::onError()(); };
 			    								self.xhr.onload = function(event) {
-                                                    if (self.xhr.status == 404) {
-                                                        console.log("404");
-													}
 			    									self.@com.github.jootnet.m2.core.NetworkUtil.XmlHttpRequest::recvHeaders(Ljava/lang/String;)(self.xhr.getAllResponseHeaders());
-			    									if (self.xhr.responseType == 'arraybuffer') {
+			    									if (self.xhr.responseType === 'arraybuffer') {
 			    										self.@com.github.jootnet.m2.core.NetworkUtil.XmlHttpRequest::onLoad(Lcom/google/gwt/typedarrays/shared/ArrayBuffer;)(self.xhr.response);
-			    									} else if (self.xhr.responseType == 'blob') {
-														console.log("blob");
 			    									} else {
 														self.@com.github.jootnet.m2.core.NetworkUtil.XmlHttpRequest::onLoad(Ljava/lang/String;)(self.xhr.response);
 													}
