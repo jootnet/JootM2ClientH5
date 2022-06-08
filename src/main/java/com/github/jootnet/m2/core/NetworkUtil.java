@@ -60,13 +60,13 @@ public final class NetworkUtil {
     }
     
     public interface HttpResponseListener {
-    	void recvHeaders(Map<String, String> headers);
+    	void recvHeaders(Map<String, String> headers, String url);
     	
-    	void onLoad(ArrayBuffer message);
-    	void onLoad(String message);
+    	void onLoad(ArrayBuffer message, String url);
+    	void onLoad(String message, String url);
     	
-    	void onError();
-    	void onTimeout();
+    	void onError(String url);
+    	void onTimeout(String url);
     }
     
     private static class XmlHttpRequest {
@@ -92,14 +92,14 @@ public final class NetworkUtil {
     	private native void _new(boolean binary, int timeout)/*-{
 			    								var self = this;
 			    								self.xhr = new XMLHttpRequest();
-			    								self.xhr.ontimeout = function(event) { self.@com.github.jootnet.m2.core.NetworkUtil.XmlHttpRequest::onTimeout()(); };
-			    								self.xhr.onerror = function(event) { self.@com.github.jootnet.m2.core.NetworkUtil.XmlHttpRequest::onError()(); };
+			    								self.xhr.ontimeout = function(event) { self.@com.github.jootnet.m2.core.NetworkUtil.XmlHttpRequest::onTimeout(Ljava/lang/String;)(self.xhr.responseURL); };
+			    								self.xhr.onerror = function(event) { self.@com.github.jootnet.m2.core.NetworkUtil.XmlHttpRequest::onError(Ljava/lang/String;)(self.xhr.responseURL); };
 			    								self.xhr.onload = function(event) {
-			    									self.@com.github.jootnet.m2.core.NetworkUtil.XmlHttpRequest::recvHeaders(Ljava/lang/String;)(self.xhr.getAllResponseHeaders());
+			    									self.@com.github.jootnet.m2.core.NetworkUtil.XmlHttpRequest::recvHeaders(Ljava/lang/String;Ljava/lang/String;)(self.xhr.getAllResponseHeaders(),self.xhr.responseURL);
 			    									if (self.xhr.responseType === 'arraybuffer') {
-			    										self.@com.github.jootnet.m2.core.NetworkUtil.XmlHttpRequest::onLoad(Lcom/google/gwt/typedarrays/shared/ArrayBuffer;)(self.xhr.response);
+			    										self.@com.github.jootnet.m2.core.NetworkUtil.XmlHttpRequest::onLoad(Lcom/google/gwt/typedarrays/shared/ArrayBuffer;Ljava/lang/String;)(self.xhr.response,self.xhr.responseURL);
 			    									} else {
-														self.@com.github.jootnet.m2.core.NetworkUtil.XmlHttpRequest::onLoad(Ljava/lang/String;)(self.xhr.response);
+														self.@com.github.jootnet.m2.core.NetworkUtil.XmlHttpRequest::onLoad(Ljava/lang/String;Ljava/lang/String;)(self.xhr.response,self.xhr.responseURL);
 													}
 												};
 												if (binary) {
@@ -120,29 +120,29 @@ public final class NetworkUtil {
     								self.xhr.send();
     								}-*/;
     	
-    	private void onTimeout() {
+    	private void onTimeout(String url) {
     		xmlHttpRequests.remove(this);
     		if (respListener != null)
-    			respListener.onTimeout();
+    			respListener.onTimeout(url);
     	}
-    	private void onLoad(String message) {
+    	private void onLoad(String message, String url) {
     		xmlHttpRequests.remove(this);
     		if (respListener != null)
-    			respListener.onLoad(message);
+    			respListener.onLoad(message,url);
     	}
-    	private void onLoad(ArrayBuffer arrayBuffer) {
+    	private void onLoad(ArrayBuffer arrayBuffer, String url) {
     		xmlHttpRequests.remove(this);
     		if (arrayBuffer != null && arrayBuffer.byteLength() > 0) {
 	    		if (respListener != null)
-	    			respListener.onLoad(arrayBuffer);
+	    			respListener.onLoad(arrayBuffer,url);
     		}
     	}
-    	private void onError() {
+    	private void onError(String url) {
     		xmlHttpRequests.remove(this);
     		if (respListener != null)
-    			respListener.onError();
+    			respListener.onError(url);
     	}
-    	private void recvHeaders(String headers) {
+    	private void recvHeaders(String headers, String url) {
     		if (!headers.trim().isEmpty()) {
     			Map<String, String> recvedHeaders = new HashMap<>();
     			String[] lines = headers.split("\\r\\n");
@@ -155,7 +155,7 @@ public final class NetworkUtil {
     			}
     			if (!recvedHeaders.isEmpty()) {
     	    		if (respListener != null)
-    	    			respListener.recvHeaders(recvedHeaders);
+    	    			respListener.recvHeaders(recvedHeaders,url);
     			}
     		}
     	}

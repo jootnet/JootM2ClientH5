@@ -44,22 +44,6 @@ import joot.m2.client.util.NetworkUtil;
  *
  */
 public final class ChrSelScene extends BaseScene {
-	/** 选择第一个角色 */
-	private ImageButton btnSelectChr1;
-	/** 选择第二个角色 */
-	private ImageButton btnSelectChr2;
-	/** 开始 */
-	private ImageButton btnEnter;
-	/** 创建人物 */
-	private ImageButton btnCreate;
-	/** 恢复人物 */
-	private ImageButton btnReback;
-	/** 删除人物 */
-	private ImageButton btnRemove;
-	/** 退出 */
-	private ImageButton btnExit;
-	/** 标题 */
-	private Label lblTitle;
 	/** 第一个角色的昵称 */
 	private Label lblName1;
 	/** 第一个角色的等级 */
@@ -112,33 +96,49 @@ public final class ChrSelScene extends BaseScene {
 		List<String> texsFileNames = new ArrayList<>();
 		Stream.of("ui1/2851", "ui1/2854", "ui1/2856", "ui1/2852", "ui1/2858", "ui1/2859", "ui1/2860",
 				"ui1/2861", "ui1/2862", "ui1/2863", "ui1/2864", "ui1/2865", "ui1/2850").forEach(fn -> texsFileNames.add(fn));
-		IntStream.range(60, 73).mapToObj(i -> "chrsel/" + i).forEach(fn -> texsFileNames.add(fn));
-		IntStream.range(100, 113).mapToObj(i -> "chrsel/" + i).forEach(fn -> texsFileNames.add(fn));
-		IntStream.range(140, 153).mapToObj(i -> "chrsel/" + i).forEach(fn -> texsFileNames.add(fn));
-		IntStream.range(180, 193).mapToObj(i -> "chrsel/" + i).forEach(fn -> texsFileNames.add(fn));
-		IntStream.range(220, 233).mapToObj(i -> "chrsel/" + i).forEach(fn -> texsFileNames.add(fn));
-		IntStream.range(260, 273).mapToObj(i -> "chrsel/" + i).forEach(fn -> texsFileNames.add(fn));
-		IntStream.range(40, 56).mapToObj(i -> "chrsel/" + i).forEach(fn -> texsFileNames.add(fn));
-		IntStream.range(80, 96).mapToObj(i -> "chrsel/" + i).forEach(fn -> texsFileNames.add(fn));
-		IntStream.range(120, 136).mapToObj(i -> "chrsel/" + i).forEach(fn -> texsFileNames.add(fn));
-		IntStream.range(160, 176).mapToObj(i -> "chrsel/" + i).forEach(fn -> texsFileNames.add(fn));
-		IntStream.range(200, 216).mapToObj(i -> "chrsel/" + i).forEach(fn -> texsFileNames.add(fn));
-		IntStream.range(240, 256).mapToObj(i -> "chrsel/" + i).forEach(fn -> texsFileNames.add(fn));
-		IntStream.range(4, 18).mapToObj(j -> "chrsel/" + j).forEach(fn -> texsFileNames.add(fn));
-		IntStream.range(23, 33).mapToObj(j -> "chrsel/" + j).forEach(fn -> texsFileNames.add(fn));
+		IntStream.range(60, 73).mapToObj(i -> "chrsel/" + i).forEach(texsFileNames::add);
+		IntStream.range(100, 113).mapToObj(i -> "chrsel/" + i).forEach(texsFileNames::add);
+		IntStream.range(140, 153).mapToObj(i -> "chrsel/" + i).forEach(texsFileNames::add);
+		IntStream.range(180, 193).mapToObj(i -> "chrsel/" + i).forEach(texsFileNames::add);
+		IntStream.range(220, 233).mapToObj(i -> "chrsel/" + i).forEach(texsFileNames::add);
+		IntStream.range(260, 273).mapToObj(i -> "chrsel/" + i).forEach(texsFileNames::add);
+		IntStream.range(40, 56).mapToObj(i -> "chrsel/" + i).forEach(texsFileNames::add);
+		IntStream.range(80, 96).mapToObj(i -> "chrsel/" + i).forEach(texsFileNames::add);
+		IntStream.range(120, 136).mapToObj(i -> "chrsel/" + i).forEach(texsFileNames::add);
+		IntStream.range(160, 176).mapToObj(i -> "chrsel/" + i).forEach(texsFileNames::add);
+		IntStream.range(200, 216).mapToObj(i -> "chrsel/" + i).forEach(texsFileNames::add);
+		IntStream.range(240, 256).mapToObj(i -> "chrsel/" + i).forEach(texsFileNames::add);
+		IntStream.range(4, 18).mapToObj(j -> "chrsel/" + j).forEach(texsFileNames::add);
+		IntStream.range(24, 33).mapToObj(j -> "chrsel/" + j).forEach(texsFileNames::add);
 		M2Texture[] texs = Images.get(texsFileNames.toArray(new String[0]));
 		if (texs == null) {
 			return false;
 		}
 		int texIdx = 0;
 		stage.addActor(new Image(texs[texIdx++]));
+		/* 选择第一个角色 */
+		ImageButton btnSelectChr1;
 		stage.addActor(btnSelectChr1 = new ImageButton(new ImageButtonStyle()));
+		/* 选择第二个角色 */
+		ImageButton btnSelectChr2;
 		stage.addActor(btnSelectChr2 = new ImageButton(new ImageButtonStyle()));
+		/* 开始 */
+		ImageButton btnEnter;
 		stage.addActor(btnEnter = new ImageButton(new ImageButtonStyle()));
+		/* 创建人物 */
+		ImageButton btnCreate;
 		stage.addActor(btnCreate = new ImageButton(new ImageButtonStyle()));
+		/* 恢复人物 */
+		ImageButton btnReback;
 		stage.addActor(btnReback = new ImageButton(new ImageButtonStyle()));
+		/* 删除人物 */
+		ImageButton btnRemove;
 		stage.addActor(btnRemove = new ImageButton(new ImageButtonStyle()));
+		/* 退出 */
+		ImageButton btnExit;
 		stage.addActor(btnExit = new ImageButton(new ImageButtonStyle()));
+		/* 标题 */
+		Label lblTitle;
 		stage.addActor(lblTitle = new Label("将唐传奇", new LabelStyle(FontUtil.Song_12_all, Color.WHITE)));
 		stage.addActor(imgChr1 = new Image());
 		stage.addActor(imgChr1Effect = new Image());
@@ -322,7 +322,7 @@ public final class ChrSelScene extends BaseScene {
 			select(-1, false);
 			return;
 		}
-		if (App.Roles != null && App.Roles.length > 0) {
+		{
 			if (lblName1 != null)
 				stage.getActors().removeValue(lblName1, true);
 			stage.addActor(
@@ -519,7 +519,7 @@ public final class ChrSelScene extends BaseScene {
 					stage.addActor(imgOpenDoor);
 
 					deltaAniOpenDoor = 0;
-					aniOpenDoor = new Animation<M2Texture>(0.15f, Images.get(IntStream.range(23, 33)
+					aniOpenDoor = new Animation<M2Texture>(0.15f, Images.get(IntStream.range(24, 33)
 							.mapToObj(j -> "chrsel/" + j).collect(Collectors.toList()).toArray(new String[0])));
 				}
 				return true;

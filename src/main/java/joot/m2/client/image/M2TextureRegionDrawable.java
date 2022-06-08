@@ -3,17 +3,18 @@ package joot.m2.client.image;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public class M2TextureRegionDrawable extends TextureRegionDrawable {
 
-	public M2TextureRegionDrawable(Texture texture, boolean blend) {
+	public M2TextureRegionDrawable(TextureRegion texture, boolean blend) {
 		super(texture);
 		this.blend = blend;
 	}
 	
 	/** 是否启用混合 */
-	private boolean blend;
+	private final boolean blend;
 	
 	@Override
 	public void draw(Batch batch, float x, float y, float originX, float originY, float width, float height,

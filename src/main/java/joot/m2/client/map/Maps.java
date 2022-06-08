@@ -49,17 +49,17 @@ public final class Maps {
 		NetworkUtil.sendHttpRequest(new HttpRequest(wdBaseUrl + "map/" + mapNo + ".map").setTimeout(5000).setBinary(), new HttpResponseListener() {
 			
 			@Override
-			public void onTimeout() {
+			public void onTimeout(String url) {
 				downloadingMaps.remove(mapNo);
 			}
 			
 			@Override
-			public void onLoad(String message) {
+			public void onLoad(String message, String url) {
 				downloadingMaps.remove(mapNo);
 			}
 			
 			@Override
-			public void onLoad(ArrayBuffer message) {
+			public void onLoad(ArrayBuffer message, String url) {
 				DataView buffer = DataViewNative.create(message);
 				try {
 					Uint8Array tmpArr = SDK.unzip(message);
@@ -107,12 +107,12 @@ public final class Maps {
 			}
 			
 			@Override
-			public void onError() {
+			public void onError(String url) {
 				downloadingMaps.remove(mapNo);
 			}
 
 			@Override
-			public void recvHeaders(java.util.Map<String, String> headers) {
+			public void recvHeaders(java.util.Map<String, String> headers, String url) {
 				
 			}
 		});

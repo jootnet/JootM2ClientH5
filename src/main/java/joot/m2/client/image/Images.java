@@ -1,17 +1,16 @@
 package joot.m2.client.image;
 
-import java.nio.ByteBufferUtil;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.github.jootnet.m2.core.NetworkUtil;
 import com.github.jootnet.m2.core.actor.Action;
 import com.github.jootnet.m2.core.actor.ChrBasicInfo;
 import com.github.jootnet.m2.core.actor.HumActionInfo;
-import com.github.jootnet.m2.core.image.WZL;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.typedarrays.shared.ArrayBuffer;
 
 public final class Images {
 
@@ -19,7 +18,7 @@ public final class Images {
 	public static String wdBaseUrl = null;
 
 	/** 用于纹理的异步加载对象 */
-	private static Map<String, WZL> WZLs = new HashMap<>();
+	private static Map<String, TexureLoader> textureLoaders = new HashMap<>();
 	/** 已加载的纹理 */
 	private static Map<String, M2Texture> textures = new ConcurrentHashMap<>();
 	private static M2Texture EMPTY;
@@ -49,7 +48,17 @@ public final class Images {
 				texs.add(tex);
 			}
 		}
-		if (texs.size() != fileNames.length) return null;
+		if (texs.size() != fileNames.length) {
+			if (texs.size() == fileNames.length - 1) {
+				for (String fileName : fileNames) {
+					M2Texture tex = textures.get(fileName);
+					if (tex == null) {
+						GWT.log("last unload fileName: " + fileName);
+					}
+				}
+			}
+			return null;
+		}
 		return texs.toArray(EMPTY_ARRAY);
 	}
 	
@@ -137,26 +146,140 @@ public final class Images {
 
 	private static void load(String fileName) {
 		String[] lib_idx = fileName.split("/");
-		if (WZLs.containsKey(lib_idx[0])) {
-			WZLs.get(lib_idx[0]).load(Integer.parseInt(lib_idx[1]));
+		if (textureLoaders.containsKey(lib_idx[0])) {
+			textureLoaders.get(lib_idx[0]).load(Integer.parseInt(lib_idx[1]));
 		} else {
-			WZL wzl = new WZL(lib_idx[0], wdBaseUrl);
-			wzl.onTextureLoaded((fno, no, tex) -> {
-				if (tex.isEmpty) {
-					if (EMPTY == null) {
-						Pixmap pm = new Pixmap(tex.width, tex.height, Pixmap.Format.RGBA8888);
-						pm.setPixels(ByteBufferUtil.of(tex.pixels.buffer()));
-						EMPTY = new M2Texture(pm, (short) tex.offsetX, (short) tex.offsetY);
+			TexureLoader loader = new TexureLoader(lib_idx[0]);
+			loader.load(Integer.parseInt(lib_idx[1]));
+			textureLoaders.put(lib_idx[0], loader);
+		}
+	}
+
+	private static class TexureLoader implements NetworkUtil.HttpResponseListener {
+
+		private String ilName;
+		private boolean atlasDownloading;
+		private Set<String> pngDownloading = new HashSet<>();
+		private Map<String, Map<String, Map<String, Integer>>> atlasContent;
+
+		private TexureLoader(String ilName) {
+			this.ilName = ilName;
+		}
+
+		private void load(int idx) {
+			if (atlasContent == null) {
+				downloadAtlas();
+				return;
+			}
+			String idxStr = String.valueOf(idx);
+			String pngName = null;
+			for (Map.Entry<String, Map<String, Map<String, Integer>>> entry : atlasContent.entrySet()) {
+				if (entry.getValue().containsKey(idxStr)) {
+					if (pngDownloading.contains(entry.getKey())) {
+						return;
 					}
-					textures.put(fno + "/" + no, EMPTY);
-				} else {
-					Pixmap pm = new Pixmap(tex.width, tex.height, Pixmap.Format.RGBA8888);
-					pm.setPixels(ByteBufferUtil.of(tex.pixels.buffer()));
-					textures.put(fno + "/" + no, new M2Texture(pm, (short) tex.offsetX, (short) tex.offsetY));
+					download(entry.getKey());
+				}
+			}
+		}
+
+		private void downloadAtlas() {
+			if (atlasContent != null || atlasDownloading) return;
+			atlasDownloading = true;
+			NetworkUtil.sendHttpRequest(new NetworkUtil.HttpRequest(wdBaseUrl + ilName + "/" + ilName + ".atlas").setTimeout(6000), this);
+		}
+
+		private void download(final String pngName) {
+			if (pngDownloading.contains(pngName)) {
+				return;
+			}
+			pngDownloading.add(pngName);
+			Pixmap.downloadFromUrl(wdBaseUrl + ilName + "/" + pngName, new Pixmap.DownloadPixmapResponseListener() {
+				@Override
+				public void downloadComplete(Pixmap pixmap) {
+					pngDownloading.remove(pngName);
+					Texture texture = new Texture(pixmap);
+					for (Map.Entry<String, Map<String, Integer>> texInfo : atlasContent.get(pngName).entrySet()) {
+						textures.put(ilName + "/" + texInfo.getKey(), new M2Texture(texture
+								, texInfo.getValue().get("x")
+								, texInfo.getValue().get("y")
+								, texInfo.getValue().get("w")
+								, texInfo.getValue().get("h")
+								, texInfo.getValue().get("ox").shortValue()
+								, texInfo.getValue().get("oy").shortValue()));
+					}
+					atlasContent.remove(pngName);
+				}
+
+				@Override
+				public void downloadFailed(Throwable t) {
+					pngDownloading.remove(pngName);
 				}
 			});
-			wzl.load(Integer.parseInt(lib_idx[1]));
-			WZLs.put(lib_idx[0], wzl);
+		}
+
+		@Override
+		public void recvHeaders(Map<String, String> headers, String url) {
+
+		}
+
+		@Override
+		public void onLoad(ArrayBuffer message, String url) {
+			atlasDownloading = false;
+		}
+
+		@Override
+		public void onLoad(String message, String url) {
+			atlasDownloading = false;
+			atlasContent = new HashMap<>();
+			String[] lines = message.split("\r\n");
+			Map<String, Map<String, Integer>> png = null;
+			Map<String, Integer> tex = null;
+			for (String _line : lines) {
+				if (_line == null) continue;
+				String line = _line.trim();
+				if (line.isEmpty()) continue;
+				if (!line.contains(":")) {
+					if (line.endsWith("png")) {
+						png = new HashMap<>();
+						tex = null;
+						atlasContent.put(line, png);
+					} else {
+						tex = new HashMap<>();
+						png.put(line, tex);
+					}
+				} else {
+					if (line.startsWith("xy")) {
+						String[] xy = line.split(":")[1].split(",");
+						xy[0] = xy[0].trim();
+						xy[1] = xy[1].trim();
+						tex.put("x", Integer.parseInt(xy[0]));
+						tex.put("y", Integer.parseInt(xy[1]));
+					} else if (line.startsWith("size") && tex != null) {
+						String[] size = line.split(":")[1].split(",");
+						size[0] = size[0].trim();
+						size[1] = size[1].trim();
+						tex.put("w", Integer.parseInt(size[0]));
+						tex.put("h", Integer.parseInt(size[1]));
+					} else if (line.startsWith("offset")) {
+						String[] offset = line.split(":")[1].split(",");
+						offset[0] = offset[0].trim();
+						offset[1] = offset[1].trim();
+						tex.put("ox", Integer.parseInt(offset[0]));
+						tex.put("oy", Integer.parseInt(offset[1]));
+					}
+				}
+			}
+		}
+
+		@Override
+		public void onError(String url) {
+			atlasDownloading = false;
+		}
+
+		@Override
+		public void onTimeout(String url) {
+			atlasDownloading = false;
 		}
 	}
 }

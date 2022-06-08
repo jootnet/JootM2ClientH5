@@ -28,9 +28,9 @@ public final class Map {
 	public String[][] objsFileName;
 	
 	/** 地图块大地砖纹理 */
-	public Texture[][] tilesTexture;
+	public TextureRegion[][] tilesTexture;
 	/** 地图块小地砖纹理 */
-	public Texture[][] smTilesTexture;
+	public TextureRegion[][] smTilesTexture;
 	
 	/** 地图对象层图片纹理 */
 	private List<TextureRegion>[] objTextureRegions;
@@ -52,8 +52,8 @@ public final class Map {
 		tilesFileName = new String[width + 1][height + 1];
 		smTilesFileName = new String[width + 1][height + 1];
 		objsFileName = new String[width + 1][height + 1];
-		tilesTexture = new Texture[width + 1][height + 1];
-		smTilesTexture = new Texture[width + 1][height + 1];
+		tilesTexture = new TextureRegion[width + 1][height + 1];
+		smTilesTexture = new TextureRegion[width + 1][height + 1];
 		objTextureRegions = new List[height + 1];
 		for (int h = 0; h < objTextureRegions.length; ++h) {
 			objTextureRegions[h] = new ArrayList<>();

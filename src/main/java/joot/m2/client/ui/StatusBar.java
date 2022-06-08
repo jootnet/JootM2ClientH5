@@ -334,8 +334,8 @@ public final class StatusBar extends WidgetGroup {
 			imgProgressExp.setSize(76, 13);
 		} else {
 			int progressWidth = (int) (76 * ((float) App.ChrPrivate.exp / App.ChrPrivate.levelUpExp));
-			imgProgressExp
-					.setDrawable(new TextureRegionDrawable(new TextureRegion(texs[texIdx_Prguse7], progressWidth, 13)));
+			//imgProgressExp
+			//		.setDrawable(new TextureRegionDrawable(new TextureRegion(texs[texIdx_Prguse7], progressWidth, 13)));
 			imgProgressExp.setSize(progressWidth, 13);
 		}
 		if (App.ChrPrivate.bagWeight == 0) {
@@ -345,8 +345,8 @@ public final class StatusBar extends WidgetGroup {
 			imgProgressBagWeight.setSize(76, 13);
 		} else {
 			int progressWidth = (int) (76 * ((float) App.ChrPrivate.bagWeight / App.ChrPrivate.maxBagWeight));
-			imgProgressBagWeight
-					.setDrawable(new TextureRegionDrawable(new TextureRegion(texs[texIdx_Prguse7], progressWidth, 13)));
+			//imgProgressBagWeight
+			//		.setDrawable(new TextureRegionDrawable(new TextureRegion(texs[texIdx_Prguse7], progressWidth, 13)));
 			imgProgressBagWeight.setSize(progressWidth, 13);
 		}
 		texIdx++;
@@ -359,12 +359,12 @@ public final class StatusBar extends WidgetGroup {
 		if (App.ChrBasic.hp == 0) {
 			imgProgressHp.setDrawable(null);
 		} else if (App.ChrBasic.hp >= App.ChrBasic.maxHp) {
-			imgProgressHp.setDrawable(new TextureRegionDrawable(new TextureRegion(texs[texIdx_Prguse4], 42, 90)));
+			//imgProgressHp.setDrawable(new TextureRegionDrawable(new TextureRegion(texs[texIdx_Prguse4], 42, 90)));
 			imgProgressHp.setSize(42, 90);
 		} else {
 			int progressHeight = (int) (90 * ((float) App.ChrBasic.hp / App.ChrBasic.maxHp));
-			imgProgressHp.setDrawable(
-					new TextureRegionDrawable(new TextureRegion(texs[texIdx_Prguse4], 42, progressHeight)));
+			//imgProgressHp.setDrawable(
+			//		new TextureRegionDrawable(new TextureRegion(texs[texIdx_Prguse4], 42, progressHeight)));
 			imgProgressHp.setSize(42, progressHeight);
 		}
 

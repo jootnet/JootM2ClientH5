@@ -174,12 +174,12 @@ public final class MapActor extends WidgetGroup implements PropertyChangeListene
 							// 即向上分，比如我们在（1，10）处有一个48*160的obj图像，则把这幅图分到（1，10）=>（1，6）
 							// 这样有好处，绘制的时候不需要多画（原来必须向下多画一些才能保证视区元素完整），更好做半透明（当人物在树下房檐下时更好针对某个地图块做半透明）
 							//	唯一可能出现的麻烦是多层问题。比如原来（1，9）处也有一个超出32高度的obj
-							int upCellCount = (int) Math.ceil(objTex[0].getHeight() / 32.f);
+							int upCellCount = (int) Math.ceil(objTex[0].getRegionHeight() / 32.f);
 							for (int upIdx = 0; upIdx < upCellCount; ++upIdx) {
 								TextureRegion region = new TextureRegion(objTex[0], 0, 
-										Math.max(0, objTex[0].getHeight() - (upIdx + 1) * 32),
-										objTex[0].getWidth(),
-										Math.min(32, objTex[0].getHeight() - upIdx * 32));
+										Math.max(0, objTex[0].getRegionHeight() - (upIdx + 1) * 32),
+										objTex[0].getRegionWidth(),
+										Math.min(32, objTex[0].getRegionHeight() - upIdx * 32));
 								map.addObjTextureRegion(game.x + w, game.y - upIdx + h, region, game.y + h);
 							}
 						}
@@ -202,7 +202,7 @@ public final class MapActor extends WidgetGroup implements PropertyChangeListene
 			for (int w = 0; w < game.width; ++w) {
 				drawingY = pixel.y;
 				for (int h = 0; h < game.height; ++h) {
-					Texture tile = map.tilesTexture[game.x + w][game.y + h];
+					TextureRegion tile = map.tilesTexture[game.x + w][game.y + h];
 					// 绘制大地砖
 					if (tile != null) {
 						transDraw(batch, (int) getWidth(), (int) getHeight(), tile, drawingX, drawingY);
@@ -216,7 +216,7 @@ public final class MapActor extends WidgetGroup implements PropertyChangeListene
 			for (int w = 0; w < game.width; ++w) {
 				drawingY = pixel.y;
 				for (int h = 0; h < game.height; ++h) {
-					Texture smTile = map.smTilesTexture[game.x + w][game.y + h];
+					TextureRegion smTile = map.smTilesTexture[game.x + w][game.y + h];
 					// 绘制小地砖
 					if (smTile != null) {
 						transDraw(batch, (int) getWidth(), (int) getHeight(), smTile, drawingX, drawingY);
