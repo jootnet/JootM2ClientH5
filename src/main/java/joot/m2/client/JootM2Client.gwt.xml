@@ -4,7 +4,6 @@
 	<source path="" />
 
 	<inherits name='com.badlogic.gdx.backends.gdx_backends_gwt' />
-	<inherits name="de.tomgrill.gdxdialogs.html.gdx_dialogs_html" />
 	
 	<inherits name="com.github.jootnet.m2.core.JootM2Core" />
 	<inherits name="java.nio.java_nio" />

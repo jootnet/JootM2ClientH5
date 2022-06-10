@@ -1,8 +1,7 @@
 package joot.m2.client.util;
 
-import de.tomgrill.gdxdialogs.core.GDXDialogs;
-import de.tomgrill.gdxdialogs.core.GDXDialogsSystem;
-import de.tomgrill.gdxdialogs.core.dialogs.GDXButtonDialog;
+import com.badlogic.gdx.Gdx;
+import com.google.gwt.user.client.ui.*;
 
 /**
  * 弹窗工具类
@@ -11,8 +10,6 @@ import de.tomgrill.gdxdialogs.core.dialogs.GDXButtonDialog;
  *
  */
 public final class DialogUtil {
-
-	private static GDXDialogs dialogs = GDXDialogsSystem.install();
 	
 	@FunctionalInterface
 	public interface OperationConsumer {
@@ -27,17 +24,7 @@ public final class DialogUtil {
 	 * @param closed 窗体关闭后的操作
 	 */
 	public static void alert(String title, String message, OperationConsumer closed) {
-		GDXButtonDialog bDialog = dialogs.newDialog(GDXButtonDialog.class);
-		bDialog.setTitle(title);
-		bDialog.setMessage(message);
-
-		bDialog.addButton("确定");
-		
-		bDialog.setClickListener(button -> {
-			if (closed != null) closed.op();
-		});
-
-		bDialog.build().show();
+		new AlertDialogBox(title, message, closed).show();
 	}
 
 	
@@ -49,17 +36,102 @@ public final class DialogUtil {
 	 * @param ok 点击“确定”按钮后执行的操作
 	 */
 	public static void confirm(String title, String message, OperationConsumer ok) {
-		GDXButtonDialog bDialog = dialogs.newDialog(GDXButtonDialog.class);
-		bDialog.setTitle(title);
-		bDialog.setMessage(message);
+		new ConfirmDialogBox(title, message, ok).show();
+	}
 
-		bDialog.addButton("确定");
-		bDialog.addButton("取消");
-		
-		bDialog.setClickListener(button -> {
-			if (button == 0 && ok != null) ok.op();
-		});
+	private static class ConfirmDialogBox extends DialogBox {
+		private OperationConsumer onOK;
+		private ConfirmDialogBox(String title, String message, OperationConsumer onOK) {
+			this.onOK = onOK;
 
-		bDialog.build().show();
+			showRelativeTo(RootPanel.get());
+
+			// Set the dialog box's caption.
+			setText(title);
+
+			VerticalPanel vPanel = new VerticalPanel();
+			HorizontalPanel hPanel = new HorizontalPanel();
+
+			// Enable animation.
+			setAnimationEnabled(true);
+
+			// Enable glass background.
+			setGlassEnabled(true);
+
+			// Center this bad boy.
+			center();
+
+			vPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_RIGHT);
+
+			Button ok = new Button("确定");
+			ok.addClickHandler(event -> ConfirmDialogBox.this.onPositive());
+
+			Button cancel = new Button("取消");
+			cancel.addClickHandler(event -> ConfirmDialogBox.this.onNegative());
+
+			hPanel.add(ok);
+			hPanel.add(cancel);
+
+			Label lbl = new Label(message);
+			vPanel.add(lbl);
+			vPanel.add(hPanel);
+
+			setWidget(vPanel);
+		}
+
+		protected void onPositive () {
+			if (onOK != null) {
+				onOK.op();
+			}
+			this.hide();
+		}
+
+		protected void onNegative () {
+			this.hide();
+		}
+	}
+
+	private static class AlertDialogBox extends DialogBox {
+		private OperationConsumer onOK;
+		private AlertDialogBox(String title, String message, OperationConsumer onOK) {
+			this.onOK = onOK;
+
+			showRelativeTo(RootPanel.get());
+
+			// Set the dialog box's caption.
+			setText(title);
+
+			VerticalPanel vPanel = new VerticalPanel();
+			HorizontalPanel hPanel = new HorizontalPanel();
+
+			// Enable animation.
+			setAnimationEnabled(true);
+
+			// Enable glass background.
+			setGlassEnabled(true);
+
+			// Center this bad boy.
+			center();
+
+			vPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_RIGHT);
+
+			Button ok = new Button("确定");
+			ok.addClickHandler(event -> AlertDialogBox.this.onPositive());
+
+			hPanel.add(ok);
+
+			Label lbl = new Label(message);
+			vPanel.add(lbl);
+			vPanel.add(hPanel);
+
+			setWidget(vPanel);
+		}
+
+		protected void onPositive () {
+			if (onOK != null) {
+				onOK.op();
+			}
+			this.hide();
+		}
 	}
 }
