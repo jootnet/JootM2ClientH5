@@ -10,6 +10,8 @@ import com.github.jootnet.m2.core.actor.Action;
 import com.github.jootnet.m2.core.actor.ChrBasicInfo;
 import com.github.jootnet.m2.core.actor.HumActionInfo;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.ImageElement;
+import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.typedarrays.shared.ArrayBuffer;
 
 public final class Images {
@@ -49,14 +51,14 @@ public final class Images {
 			}
 		}
 		if (texs.size() != fileNames.length) {
-			if (texs.size() == fileNames.length - 1) {
+			/*if (texs.size() == fileNames.length - 1) {
 				for (String fileName : fileNames) {
 					M2Texture tex = textures.get(fileName);
 					if (tex == null) {
 						GWT.log("last unload fileName: " + fileName);
 					}
 				}
-			}
+			}*/
 			return null;
 		}
 		return texs.toArray(EMPTY_ARRAY);
@@ -194,25 +196,52 @@ public final class Images {
 				return;
 			}
 			pngDownloading.add(pngName);
-			Pixmap.downloadFromUrl(wdBaseUrl + ilName + "/" + pngName, new Pixmap.DownloadPixmapResponseListener() {
+			NetworkUtil.sendHttpRequest(new NetworkUtil.HttpRequest(wdBaseUrl + ilName + "/" + pngName).setTimeout(18000).setBinary(), new NetworkUtil.HttpResponseListener() {
 				@Override
-				public void downloadComplete(Pixmap pixmap) {
-					pngDownloading.remove(pngName);
-					Texture texture = new Texture(pixmap);
-					for (Map.Entry<String, Map<String, Integer>> texInfo : atlasContent.get(pngName).entrySet()) {
-						textures.put(ilName + "/" + texInfo.getKey(), new M2Texture(texture
-								, texInfo.getValue().get("x")
-								, texInfo.getValue().get("y")
-								, texInfo.getValue().get("w")
-								, texInfo.getValue().get("h")
-								, texInfo.getValue().get("ox").shortValue()
-								, texInfo.getValue().get("oy").shortValue()));
-					}
-					atlasContent.remove(pngName);
+				public void recvHeaders(Map<String, String> headers, String url) {
+
 				}
 
 				@Override
-				public void downloadFailed(Throwable t) {
+				public void onLoad(ArrayBuffer message, String url) {
+					final ImageElement image = createImage();
+					image.setAttribute("crossOrigin", "anonymous");
+					hookImgListener(image, event -> {
+						pngDownloading.remove(pngName);
+						if (event.getType().equals("error")) {
+						}
+						else {
+							Texture texture = new Texture(new Pixmap(image));
+							if (!atlasContent.containsKey(pngName)) {
+								GWT.log(pngName);
+							}
+							for (Map.Entry<String, Map<String, Integer>> texInfo : atlasContent.get(pngName).entrySet()) {
+								textures.put(ilName + "/" + texInfo.getKey(), new M2Texture(texture
+										, texInfo.getValue().get("x")
+										, texInfo.getValue().get("y")
+										, texInfo.getValue().get("w")
+										, texInfo.getValue().get("h")
+										, texInfo.getValue().get("ox").shortValue()
+										, texInfo.getValue().get("oy").shortValue()));
+							}
+							atlasContent.remove(pngName);
+						}
+					});
+					image.setSrc(url);
+				}
+
+				@Override
+				public void onLoad(String message, String url) {
+					pngDownloading.remove(pngName);
+				}
+
+				@Override
+				public void onError(String url) {
+					pngDownloading.remove(pngName);
+				}
+
+				@Override
+				public void onTimeout(String url) {
 					pngDownloading.remove(pngName);
 				}
 			});
@@ -282,4 +311,27 @@ public final class Images {
 			atlasDownloading = false;
 		}
 	}
+
+	private interface ImgEventListener {
+		void onEvent (NativeEvent event);
+	}
+
+	static native void hookImgListener (ImageElement img, Images.ImgEventListener h) /*-{
+		img
+				.addEventListener(
+						'load',
+						function(e) {
+							h.@joot.m2.client.image.Images.ImgEventListener::onEvent(Lcom/google/gwt/dom/client/NativeEvent;)(e);
+						}, false);
+		img
+				.addEventListener(
+						'error',
+						function(e) {
+							h.@joot.m2.client.image.Images.ImgEventListener::onEvent(Lcom/google/gwt/dom/client/NativeEvent;)(e);
+						}, false);
+	}-*/;
+
+	static native ImageElement createImage () /*-{
+		return new Image();
+	}-*/;
 }
