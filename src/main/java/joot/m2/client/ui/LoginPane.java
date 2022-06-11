@@ -2,6 +2,7 @@ package joot.m2.client.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -16,6 +17,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.github.jootnet.m2.core.net.MessageType;
 import com.github.jootnet.m2.core.net.messages.LoginResp;
 
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.user.client.ui.RootPanel;
 import joot.m2.client.App;
 import joot.m2.client.image.Images;
 import joot.m2.client.image.M2Texture;
