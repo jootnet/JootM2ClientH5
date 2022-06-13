@@ -102,6 +102,9 @@ public final class LoginPane extends WidgetGroup {
 	 * 将焦点给到输入框
 	 */
 	public void focusInput() {
+		RootPanel.get().getElement().focus();
+		txtUna.setText("");
+		txtPsw.setText("");
 		getStage().setKeyboardFocus(txtUna);
 	}
 

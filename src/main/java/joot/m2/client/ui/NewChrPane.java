@@ -25,13 +25,11 @@ import com.github.jootnet.m2.core.net.messages.LoginResp;
 import com.github.jootnet.m2.core.net.messages.LoginResp.Role;
 import com.github.jootnet.m2.core.net.messages.NewChrResp;
 
+import com.google.gwt.dom.client.InputElement;
 import joot.m2.client.App;
 import joot.m2.client.image.Images;
 import joot.m2.client.image.M2Texture;
-import joot.m2.client.util.DialogUtil;
-import joot.m2.client.util.DrawableUtil;
-import joot.m2.client.util.FontUtil;
-import joot.m2.client.util.NetworkUtil;
+import joot.m2.client.util.*;
 
 /**
  * 创建角色
@@ -42,7 +40,7 @@ import joot.m2.client.util.NetworkUtil;
 public class NewChrPane extends WidgetGroup {
 	private Image bg;
 	/** 昵称 */
-	private TextField txtName;
+	private InputElement txtName;
 	/** 选择战士 */
 	private ImageButton btnWarrior;
 	/** 选择法师 */
@@ -82,9 +80,10 @@ public class NewChrPane extends WidgetGroup {
 
 	@Override
 	public void act(float delta) {
-		initializeComponents();
+		if (!initializeComponents()) return;
 		if (isVisible() && !lastVisible) {
-			getStage().setKeyboardFocus(txtName);
+			InputUtil.show("newChr-txtName");
+			txtName.focus();
 		}
 		lastVisible = isVisible();
 
@@ -196,9 +195,7 @@ public class NewChrPane extends WidgetGroup {
 		addActor(btnClose = new ImageButton(
 				new ImageButtonStyle(null, new TextureRegionDrawable(texs[texIdx++]), null, null, null, null)));
 
-		addActor(txtName = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
-				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
-		txtName.setWidth(133);
+		txtName = InputUtil.newInput("newChr-txtName", 646, 198, 133, 1, "white", "transparent");
 		txtName.setMaxLength(10);
 		addActor(imgChr1 = new Image());
 		imgChr1.setPosition(152, 300);
@@ -265,6 +262,7 @@ public class NewChrPane extends WidgetGroup {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				setVisible(false);
+				InputUtil.hide("newChr-txtName");
 				if (closeConsumer != null)
 					closeConsumer.op();
 			}
@@ -274,8 +272,8 @@ public class NewChrPane extends WidgetGroup {
 
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				if (!txtName.getText().trim().isEmpty())
-					NetworkUtil.sendNewChr(txtName.getText(), occu, gender);
+				if (!txtName.getValue().trim().isEmpty())
+					NetworkUtil.sendNewChr(txtName.getValue(), occu, gender);
 			}
 
 		});
@@ -283,7 +281,6 @@ public class NewChrPane extends WidgetGroup {
 		select();
 
 		bg.setPosition(573, 259);
-		txtName.setPosition(646, 555);
 		btnWarrior.setPosition(621, 483);
 		btnMaster.setPosition(666, 483);
 		btnTaoist.setPosition(711, 483);

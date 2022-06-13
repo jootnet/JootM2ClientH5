@@ -571,7 +571,6 @@ public final class ChrSelScene extends BaseScene {
 			return false;
 		});
 
-		//super.render(delta);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		stage.act(delta);
 		stage.draw();

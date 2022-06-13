@@ -3,6 +3,8 @@ package joot.m2.client;
 import java.util.Map;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.github.jootnet.m2.core.actor.ChrBasicInfo;
 import com.github.jootnet.m2.core.actor.ChrPrivateInfo;
 import com.github.jootnet.m2.core.actor.ChrPublicInfo;
@@ -56,6 +58,7 @@ public class App extends Game {
 	
 	@Override
 	public void create() {
+		Gdx.input.setCatchKey(Input.Keys.TAB, true);
 		NetworkUtil.init("ws://127.0.0.1:55842/m2");
 		NetworkUtil.start();
 		Maps.init("http://127.0.0.1:8080/");

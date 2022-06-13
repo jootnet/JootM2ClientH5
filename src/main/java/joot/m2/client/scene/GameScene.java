@@ -61,6 +61,7 @@ public final class GameScene extends BaseScene {
 		mapActor.setFillParent(true);
 		mapActor.addListener(new InputListenerInMap());
 		stage.addActor(mapActor);
+		stage.setKeyboardFocus(mapActor);
 
 		statusBar = new StatusBar();
 		statusBar.setSize(768, 251);

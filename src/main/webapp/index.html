@@ -17,6 +17,10 @@
               function handleMouseDown(evt) {
                 evt.preventDefault();
                 evt.stopPropagation();
+                let inputs = document.querySelectorAll("input.jootm2");
+                for (let i = 0; i < inputs.length; i++) {
+                       inputs[i].blur();
+                }
                 window.focus();
               }
 

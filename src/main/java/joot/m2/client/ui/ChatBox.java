@@ -23,11 +23,13 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Null;
 
+import com.google.gwt.dom.client.InputElement;
 import joot.m2.client.App;
 import joot.m2.client.image.Images;
 import joot.m2.client.image.M2Texture;
 import joot.m2.client.util.DrawableUtil;
 import joot.m2.client.util.FontUtil;
+import joot.m2.client.util.InputUtil;
 
 /**
  * 聊天框
@@ -37,7 +39,7 @@ import joot.m2.client.util.FontUtil;
  */
 public final class ChatBox extends WidgetGroup {	
 	/** 文本输入 */
-	TextField txtChat;
+	InputElement txtChat;
 	/** 逐行显示历史消息的控件 */
 	private Table[] linesMsg;
 	private String[] strsMsg; // 历史消息内容
@@ -97,7 +99,7 @@ public final class ChatBox extends WidgetGroup {
 			lblMsg.addListener(new ClickListener() {
 				
 				public void clicked(InputEvent event, float x, float y) {
-					txtChat.setText(lblMsg.getText().toString());
+					txtChat.setValue(lblMsg.getText().toString());
 				}
 				
 			});
@@ -115,39 +117,30 @@ public final class ChatBox extends WidgetGroup {
 		if (inited) return true;
 		M2Texture[] texs = Images.get(IntStream.range(500, 510).mapToObj(i -> "ui3/" + i).collect(Collectors.toList()).toArray(new String[0]));
 		if (texs == null) return false;
-		addActor(txtChat = new TextField("", new TextField.TextFieldStyle(FontUtil.Song_12_all,
-				Color.BLACK,
-				DrawableUtil.Cursor_DarkGray,
-				DrawableUtil.Bg_LightGray,
-				null)));
-		txtChat.setPosition(16, 6);
-		txtChat.setWidth(606);
+		txtChat = InputUtil.newInput("game-chatbox-txtChat", 208, 748, 606, 1, "black", "transparent");
 		txtChat.setMaxLength(100);
-		txtChat.addListener(new InputListener() {
-			@Override
-			public boolean keyUp(InputEvent event, int keycode) {
-				if (keycode == Keys.ENTER || keycode == Keys.NUMPAD_ENTER) {
-					String say = txtChat.getText().trim();
-					if (say.isEmpty()) return true;
-					if (say.equals("@smoothon")) {
-						App.SmoothMoving = true;
-						appendMsg("enable smooth moving", Color.GREEN, null);
-						txtChat.setText("");
-						return true;
-					}
-					if (say.equals("@smoothoff")) {
-						App.SmoothMoving = false;
-						appendMsg("disable smooth moving", Color.WHITE, DrawableUtil.Bg_Red);
-						txtChat.setText("");
-						return true;
-					}
-					appendMsg(say, null, null);
-					txtChat.setText("");
-					return true;
+		InputUtil.show("game-chatbox-txtChat");
+		InputUtil.hookKeyUp(txtChat, key -> {
+			if (key.equals("Enter")) {
+				String say = txtChat.getValue().trim();
+				if (say.isEmpty()) return;
+				if (say.equals("@smoothon")) {
+					App.SmoothMoving = true;
+					appendMsg("enable smooth moving", Color.GREEN, null);
+					txtChat.setValue("");
+					return;
 				}
-				return false;
+				if (say.equals("@smoothoff")) {
+					App.SmoothMoving = false;
+					appendMsg("disable smooth moving", Color.WHITE, DrawableUtil.Bg_Red);
+					txtChat.setValue("");
+					return;
+				}
+				appendMsg(say, null, null);
+				txtChat.setValue("");
 			}
 		});
+		txtChat.blur();
 		linesMsg = new Table[8]; // 显示8行文字
 		for (int i = 0; i < linesMsg.length; ++i) {
 			linesMsg[i] = new Table();

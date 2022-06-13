@@ -172,7 +172,7 @@ public final class StatusBar extends WidgetGroup {
 	 * 将焦点给到输入框
 	 */
 	public void focusInput() {
-		getStage().setKeyboardFocus(chatBox.txtChat);
+		chatBox.txtChat.focus();
 	}
 
 	private boolean inited;

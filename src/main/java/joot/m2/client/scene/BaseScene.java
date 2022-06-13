@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import joot.m2.client.util.InputUtil;
 
 /**
  * 场景基类
@@ -51,6 +52,7 @@ abstract class BaseScene implements Screen {
 
 	@Override
 	public void hide() {
+		InputUtil.hideAll();
 		stage.clear();
 	}
 

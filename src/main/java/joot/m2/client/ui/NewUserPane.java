@@ -19,12 +19,11 @@ import com.badlogic.gdx.utils.Align;
 import com.github.jootnet.m2.core.net.MessageType;
 import com.github.jootnet.m2.core.net.messages.NewUserResp;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.InputElement;
 import joot.m2.client.image.Images;
 import joot.m2.client.image.M2Texture;
-import joot.m2.client.util.DialogUtil;
-import joot.m2.client.util.DrawableUtil;
-import joot.m2.client.util.FontUtil;
-import joot.m2.client.util.NetworkUtil;
+import joot.m2.client.util.*;
 
 /**
  * 创建用户
@@ -42,27 +41,27 @@ public class NewUserPane extends WidgetGroup {
 	/** 叉叉 */
 	private ImageButton btnClose;
 	/** 用户名 */
-	private TextField txtUna;
+	private InputElement txtUna;
 	/** 密码 */
-	private TextField txtPsw;
+	private InputElement txtPsw;
 	/** 确认密码 */
-	private TextField txtPsw1;
+	private InputElement txtPsw1;
 	/** 君の名は。 */
-	private TextField txtName;
+	private InputElement txtName;
 	/** 安全问题1 */
-	private TextField txtQ1;
+	private InputElement txtQ1;
 	/** 安全问题答案1 */
-	private TextField txtA1;
+	private InputElement txtA1;
 	/** 安全问题2 */
-	private TextField txtQ2;
+	private InputElement txtQ2;
 	/** 安全问题答案2 */
-	private TextField txtA2;
+	private InputElement txtA2;
 	/** 固定电话 */
-	private TextField txtTelPhone;
+	private InputElement txtTelPhone;
 	/** 移动电话 */
-	private TextField txtiPhone;
+	private InputElement txtiPhone;
 	/** 邮箱 */
-	private TextField txtMail;
+	private InputElement txtMail;
 	/** 提示信息 */
 	private Label lblTips;
 	private OperationConsumer closeConsumer;
@@ -84,9 +83,20 @@ public class NewUserPane extends WidgetGroup {
 
 	@Override
 	public void act(float delta) {
-		initializeComponents();
+		if (!initializeComponents()) return;
 		if (isVisible() && !lastVisible) {
-			getStage().setKeyboardFocus(txtUna);
+			InputUtil.show("login-newUser-txtUna");
+			InputUtil.show("login-newUser-txtPsw");
+			InputUtil.show("login-newUser-txtPsw1");
+			InputUtil.show("login-newUser-txtName");
+			InputUtil.show("login-newUser-txtQ1");
+			InputUtil.show("login-newUser-txtA1");
+			InputUtil.show("login-newUser-txtQ2");
+			InputUtil.show("login-newUser-txtA2");
+			InputUtil.show("login-newUser-txtTelPhone");
+			InputUtil.show("login-newUser-txtiPhone");
+			InputUtil.show("login-newUser-txtMail");
+			txtUna.focus();
 		}
 		lastVisible = isVisible();
 
@@ -130,192 +140,115 @@ public class NewUserPane extends WidgetGroup {
 		addActor(btnClose = new ImageButton(
 				new ImageButtonStyle(null, new TextureRegionDrawable(texs[3]), null, null, null, null)));
 
-		addActor(txtUna = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
-				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
-		txtUna.setWidth(112);
+		txtUna = InputUtil.newInput("login-newUser-txtUna", 356, 263, 112, 1, "white", "transparent");
 		txtUna.setMaxLength(18);
-		txtUna.setTextFieldFilter((t, c) -> Character.isLetterOrDigit(c));
-		txtUna.addListener(new FocusListener() {
-
-			@Override
-			public void keyboardFocusChanged(FocusEvent event, Actor actor, boolean focused) {
-				if (focused) {
-					lblTips.setText("登陆用户名\n可以输入字母（大小写）数字\n最长18位");
-				} else {
-					lblTips.setText("");
-				}
+		InputUtil.setTextFieldFilter(txtUna, Character::isLetterOrDigit);
+		InputUtil.onFocusChange(txtUna, focused -> {
+			if (focused) {
+				lblTips.setText("登陆用户名\n可以输入字母（大小写）数字\n最长18位");
+			} else {
+				lblTips.setText("");
 			}
-
 		});
-		addActor(txtPsw = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
-				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
-		txtPsw.setWidth(112);
+		txtPsw = InputUtil.newInput("login-newUser-txtPsw", 356, 284, 112, 2, "white", "transparent");
 		txtPsw.setMaxLength(20);
-		txtPsw.setTextFieldFilter((t, c) -> Character.isLetterOrDigit(c) || c == '@' || c == '$' || c == '.' || c == '_'
+		InputUtil.setTextFieldFilter(txtPsw, c -> Character.isLetterOrDigit(c) || c == '@' || c == '$' || c == '.' || c == '_'
 				|| c == '-' || c == '*' || c == '^' || c == '%' || c == '&' || c == '#' || c == '!' || c == '~'
 				|| c == '`');
-		txtPsw.addListener(new FocusListener() {
-
-			@Override
-			public void keyboardFocusChanged(FocusEvent event, Actor actor, boolean focused) {
-				if (focused) {
-					lblTips.setText("登陆密码\n可以输入字母（大小写）数字\n以及“~`@#$%^&*_-”等符号\n最长20位");
-				} else {
-					lblTips.setText("");
-				}
+		InputUtil.onFocusChange(txtPsw, focused -> {
+			if (focused) {
+				lblTips.setText("登陆密码\n可以输入字母（大小写）数字\n以及“~`@#$%^&*_-”等符号\n最长20位");
+			} else {
+				lblTips.setText("");
 			}
-
 		});
-		addActor(txtPsw1 = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
-				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
-		txtPsw1.setWidth(112);
+		txtPsw1 = InputUtil.newInput("login-newUser-txtPsw1", 356, 305, 112, 3, "white", "transparent");
 		txtPsw1.setMaxLength(20);
-		txtPsw1.setTextFieldFilter((t, c) -> Character.isLetterOrDigit(c) || c == '@' || c == '$' || c == '.'
+		InputUtil.setTextFieldFilter(txtPsw1, c -> Character.isLetterOrDigit(c) || c == '@' || c == '$' || c == '.'
 				|| c == '_' || c == '-' || c == '*' || c == '^' || c == '%' || c == '&' || c == '#' || c == '!'
 				|| c == '~' || c == '`');
-		txtPsw1.addListener(new FocusListener() {
-
-			@Override
-			public void keyboardFocusChanged(FocusEvent event, Actor actor, boolean focused) {
-				if (focused) {
-					lblTips.setText("再次输入密码以确认");
-				} else {
-					lblTips.setText("");
-				}
+		InputUtil.onFocusChange(txtPsw1, focused -> {
+			if (focused) {
+				lblTips.setText("再次输入密码以确认");
+			} else {
+				lblTips.setText("");
 			}
-
 		});
-		addActor(txtName = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
-				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
-		txtName.setWidth(112);
+		txtName = InputUtil.newInput("login-newUser-txtName", 356, 334, 112, 4, "white", "transparent");
 		txtName.setMaxLength(10);
-		txtName.setTextFieldFilter((t, c) -> (c >= 0x4e00) && (c <= 0x9fbb));
-		txtName.addListener(new FocusListener() {
-
-			@Override
-			public void keyboardFocusChanged(FocusEvent event, Actor actor, boolean focused) {
-				if (focused) {
-					lblTips.setText("姓名\n只能输入中文\n最长10位");
-				} else {
-					lblTips.setText("");
-				}
+		InputUtil.setTextFieldFilter(txtName, c -> (c >= 0x4e00) && (c <= 0x9fbb));
+		InputUtil.onFocusChange(txtName, focused -> {
+			if (focused) {
+				lblTips.setText("姓名\n只能输入中文\n最长10位");
+			} else {
+				lblTips.setText("");
 			}
-
 		});
-		addActor(txtQ1 = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
-				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
-		txtQ1.setWidth(160);
+		txtQ1 = InputUtil.newInput("login-newUser-txtQ1", 356, 403, 160, 5, "white", "transparent");
 		txtQ1.setMaxLength(20);
-		txtQ1.addListener(new FocusListener() {
-
-			@Override
-			public void keyboardFocusChanged(FocusEvent event, Actor actor, boolean focused) {
-				if (focused) {
-					lblTips.setText("密码找回问题1\n请认真填写\n最长20位");
-				} else {
-					lblTips.setText("");
-				}
+		InputUtil.onFocusChange(txtQ1, focused -> {
+			if (focused) {
+				lblTips.setText("密码找回问题1\n请认真填写\n最长20位");
+			} else {
+				lblTips.setText("");
 			}
-
 		});
-		addActor(txtA1 = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
-				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
-		txtA1.setWidth(160);
+		txtA1 = InputUtil.newInput("login-newUser-txtA1", 356, 423, 160, 6, "white", "transparent");
 		txtA1.setMaxLength(20);
-		txtA1.addListener(new FocusListener() {
-
-			@Override
-			public void keyboardFocusChanged(FocusEvent event, Actor actor, boolean focused) {
-				if (focused) {
-					lblTips.setText("密码找回答案1\n最长20位");
-				} else {
-					lblTips.setText("");
-				}
+		InputUtil.onFocusChange(txtA1, focused -> {
+			if (focused) {
+				lblTips.setText("密码找回答案1\n最长20位");
+			} else {
+				lblTips.setText("");
 			}
-
 		});
-		addActor(txtQ2 = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
-				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
-		txtQ2.setWidth(160);
+		txtQ2 = InputUtil.newInput("login-newUser-txtQ2", 356, 443, 160, 7, "white", "transparent");
 		txtQ2.setMaxLength(20);
-		txtQ2.addListener(new FocusListener() {
-
-			@Override
-			public void keyboardFocusChanged(FocusEvent event, Actor actor, boolean focused) {
-				if (focused) {
-					lblTips.setText("密码找回问题2\n最长20位");
-				} else {
-					lblTips.setText("");
-				}
+		InputUtil.onFocusChange(txtQ2, focused -> {
+			if (focused) {
+				lblTips.setText("密码找回问题2\n最长20位");
+			} else {
+				lblTips.setText("");
 			}
-
 		});
-		addActor(txtA2 = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
-				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
-		txtA2.setWidth(160);
+		txtA2 = InputUtil.newInput("login-newUser-txtA2", 356, 463, 160, 8, "white", "transparent");
 		txtA2.setMaxLength(20);
-		txtA2.addListener(new FocusListener() {
-
-			@Override
-			public void keyboardFocusChanged(FocusEvent event, Actor actor, boolean focused) {
-				if (focused) {
-					lblTips.setText("密码找回答案2\n最长20位");
-				} else {
-					lblTips.setText("");
-				}
+		InputUtil.onFocusChange(txtA2, focused -> {
+			if (focused) {
+				lblTips.setText("密码找回答案2\n最长20位");
+			} else {
+				lblTips.setText("");
 			}
-
 		});
-		addActor(txtTelPhone = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
-				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
-		txtTelPhone.setWidth(112);
+		txtTelPhone = InputUtil.newInput("login-newUser-txtTelPhone", 356, 493, 112, 9, "white", "transparent");
 		txtTelPhone.setMaxLength(18);
-		txtTelPhone.setTextFieldFilter(new TextFieldFilter.DigitsOnlyFilter());
-		txtTelPhone.addListener(new FocusListener() {
-
-			@Override
-			public void keyboardFocusChanged(FocusEvent event, Actor actor, boolean focused) {
-				if (focused) {
-					lblTips.setText("固定电话号码\n只能输入数字\n最长18位");
-				} else {
-					lblTips.setText("");
-				}
+		InputUtil.setTextFieldFilter(txtTelPhone, c -> (c >= '0') && (c <= '9'));
+		InputUtil.onFocusChange(txtTelPhone, focused -> {
+			if (focused) {
+				lblTips.setText("固定电话号码\n只能输入数字\n最长18位");
+			} else {
+				lblTips.setText("");
 			}
-
 		});
-		addActor(txtiPhone = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
-				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
-		txtiPhone.setWidth(112);
+		txtiPhone = InputUtil.newInput("login-newUser-txtiPhone", 356, 514, 112, 10, "white", "transparent");
 		txtiPhone.setMaxLength(18);
-		txtiPhone.setTextFieldFilter(new TextFieldFilter.DigitsOnlyFilter());
-		txtiPhone.addListener(new FocusListener() {
-
-			@Override
-			public void keyboardFocusChanged(FocusEvent event, Actor actor, boolean focused) {
-				if (focused) {
-					lblTips.setText("手机号码\n只能输入数字\n最长18位");
-				} else {
-					lblTips.setText("");
-				}
+		InputUtil.setTextFieldFilter(txtiPhone, c -> (c >= '0') && (c <= '9'));
+		InputUtil.onFocusChange(txtiPhone, focused -> {
+			if (focused) {
+				lblTips.setText("手机号码\n只能输入数字\n最长18位");
+			} else {
+				lblTips.setText("");
 			}
-
 		});
-		addActor(txtMail = new TextField("", new TextFieldStyle(FontUtil.Song_12_all, Color.WHITE,
-				DrawableUtil.Cursor_White, DrawableUtil.Bg_LightGray, null)));
-		txtMail.setWidth(160);
+		txtMail = InputUtil.newInput("login-newUser-txtMail", 356, 535, 160, 11, "white", "transparent");
 		txtMail.setMaxLength(20);
-		txtMail.setTextFieldFilter((t, c) -> Character.isLetterOrDigit(c) || c == '-' || c == '.' || c == '@');
-		txtMail.addListener(new FocusListener() {
-
-			@Override
-			public void keyboardFocusChanged(FocusEvent event, Actor actor, boolean focused) {
-				if (focused) {
-					lblTips.setText("电子邮箱地址\n最长20位");
-				} else {
-					lblTips.setText("");
-				}
+		InputUtil.setTextFieldFilter(txtMail, c -> Character.isLetterOrDigit(c) || c == '-' || c == '.' || c == '@');
+		InputUtil.onFocusChange(txtMail, focused -> {
+			if (focused) {
+				lblTips.setText("电子邮箱地址\n最长20位");
+			} else {
+				lblTips.setText("");
 			}
-
 		});
 		addActor(lblTips = new Label("", new LabelStyle(FontUtil.Song_12_all, Color.WHITE)));
 		lblTips.setAlignment(Align.top | Align.left, Align.left);
@@ -324,6 +257,7 @@ public class NewUserPane extends WidgetGroup {
 		btnCancel.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
+				InputUtil.hideAll();
 				if (closeConsumer != null)
 					closeConsumer.op();
 			}
@@ -331,6 +265,7 @@ public class NewUserPane extends WidgetGroup {
 		btnClose.addListener(new ClickListener() {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
+				InputUtil.hideAll();
 				if (closeConsumer != null)
 					closeConsumer.op();
 			}
@@ -338,9 +273,9 @@ public class NewUserPane extends WidgetGroup {
 		btnCommit.addListener(new ClickListener() {
 
 			public void clicked(InputEvent event, float x, float y) {
-				NetworkUtil.sendNewUser(txtUna.getText(), txtPsw.getText(), txtName.getText(), txtQ1.getText(),
-						txtA1.getText(), txtQ2.getText(), txtA2.getText(), txtTelPhone.getText(), txtiPhone.getText(),
-						txtMail.getText());
+				NetworkUtil.sendNewUser(txtUna.getValue(), txtPsw.getValue(), txtName.getValue(), txtQ1.getValue(),
+						txtA1.getValue(), txtQ2.getValue(), txtA2.getValue(), txtTelPhone.getValue(), txtiPhone.getValue(),
+						txtMail.getValue());
 			}
 
 		});
@@ -349,7 +284,7 @@ public class NewUserPane extends WidgetGroup {
 		btnCommit.setPosition((getStage().getWidth() - bg.getWidth()) / 2 + 158, (getStage().getHeight() - bg.getHeight()) / 2 + 24.5f);
 		btnCancel.setPosition((getStage().getWidth() - bg.getWidth()) / 2 + 446, (getStage().getHeight() - bg.getHeight()) / 2 + 21.5f);
 		btnClose.setPosition((getStage().getWidth() - bg.getWidth()) / 2 + 587, (getStage().getHeight() - bg.getHeight()) / 2 + 417.5f);
-		txtUna.setPosition((getStage().getWidth() - bg.getWidth()) / 2 + 164, (getStage().getHeight() - bg.getHeight()) / 2 + 344);
+		/*txtUna.setPosition((getStage().getWidth() - bg.getWidth()) / 2 + 164, (getStage().getHeight() - bg.getHeight()) / 2 + 344);
 		txtPsw.setPosition((getStage().getWidth() - bg.getWidth()) / 2 + 164, (getStage().getHeight() - bg.getHeight()) / 2 + 323);
 		txtPsw1.setPosition((getStage().getWidth() - bg.getWidth()) / 2 + 164, (getStage().getHeight() - bg.getHeight()) / 2 + 302);
 		txtName.setPosition((getStage().getWidth() - bg.getWidth()) / 2 + 164, (getStage().getHeight() - bg.getHeight()) / 2 + 272);
@@ -359,7 +294,7 @@ public class NewUserPane extends WidgetGroup {
 		txtA2.setPosition((getStage().getWidth() - bg.getWidth()) / 2 + 164, (getStage().getHeight() - bg.getHeight()) / 2 + 143);
 		txtTelPhone.setPosition((getStage().getWidth() - bg.getWidth()) / 2 + 164, (getStage().getHeight() - bg.getHeight()) / 2 + 113);
 		txtiPhone.setPosition((getStage().getWidth() - bg.getWidth()) / 2 + 164, (getStage().getHeight() - bg.getHeight()) / 2 + 92);
-		txtMail.setPosition((getStage().getWidth() - bg.getWidth()) / 2 + 164, (getStage().getHeight() - bg.getHeight()) / 2 + 71);
+		txtMail.setPosition((getStage().getWidth() - bg.getWidth()) / 2 + 164, (getStage().getHeight() - bg.getHeight()) / 2 + 71);*/
 		lblTips.setPosition((getStage().getWidth() - bg.getWidth()) / 2 + 386, (getStage().getHeight() - bg.getHeight()) / 2 + 73);
 
 		inited = true;
