@@ -212,9 +212,6 @@ public final class Images {
 						}
 						else {
 							Texture texture = new Texture(new Pixmap(image));
-							if (!atlasContent.containsKey(pngName)) {
-								GWT.log(pngName);
-							}
 							for (Map.Entry<String, Map<String, Integer>> texInfo : atlasContent.get(pngName).entrySet()) {
 								textures.put(ilName + "/" + texInfo.getKey(), new M2Texture(texture
 										, texInfo.getValue().get("x")
